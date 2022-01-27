@@ -25,5 +25,8 @@ public final class Constants {
         // joystick ports
         public static final int leftJoystick = 4;
         public static final int rightJoystick = 5;
+
+        // max output
+        public static final double maxOutput = 0.5;
     }
 }
