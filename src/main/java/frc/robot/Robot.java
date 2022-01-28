@@ -42,7 +42,9 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     SmartDashboard.putData(CommandScheduler.getInstance());
-    SmartDashboard.putNumber("Joystick Axis", m_robotContainer.driveJoystick.getY());
+
+    SmartDashboard.putNumber("Gamepad Left Y Axis", m_robotContainer.driveController.getLeftY());
+    SmartDashboard.putNumber("Gamepad Right Y Axis", m_robotContainer.driveController.getRightY());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
