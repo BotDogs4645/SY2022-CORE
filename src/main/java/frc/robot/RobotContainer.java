@@ -8,6 +8,7 @@ import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,20 +33,19 @@ public class RobotContainer {
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
   // Initing the Joysticks so that we can pass them to the Drive command
-  private final Joystick leftJoystick = new Joystick(Constants.DriveConstants.leftJoystick);
-  private final Joystick rightJoystick = new Joystick(Constants.DriveConstants.rightJoystick);
+  public final Joystick driveJoystick = new Joystick(Constants.DriveConstants.driveJoystick);
 
   // Drive subsystem
-  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, leftJoystick, rightJoystick);
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveJoystick);
   
   // Drive command
-  public final Drive driveCommand = new Drive(driveSubsystem, leftJoystick, rightJoystick);
+  public final Drive driveCommand = new Drive(driveSubsystem);
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     //invert right side of the drive train
-    rightMotors.setInverted(true);
-
+    leftMotors.setInverted(true);
+    driveSubsystem.setDefaultCommand(driveCommand);
     // Configure the button bindings
     configureButtonBindings();
   }

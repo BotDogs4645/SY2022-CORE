@@ -11,7 +11,7 @@ public class Drive extends CommandBase {
   private DriveTrain driveTrainSubsystem;
 
   // initialize Drive command
-  public Drive(DriveTrain subsystem, Joystick leftJoystick, Joystick rightJoystick) {
+  public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
     addRequirements(driveTrainSubsystem);
   }
