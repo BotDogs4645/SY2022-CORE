@@ -11,16 +11,16 @@ package frc.robot;
 public final class Constants {
     public static final class DriveConstants {
         // left motor ports
-        public static final int upperLeftMotor = 0;
-        public static final int lowerLeftMotor = 1;
+        public static final int upperLeftMotor = 8;
+        public static final int lowerLeftMotor = 9;
 
         // right motor ports
-        public static final int upperRightMotor = 2;
-        public static final int lowerRightMotor = 3;
+        public static final int upperRightMotor = 7;
+        public static final int lowerRightMotor = 10;
 
         // joystick ports
-        public static final int leftJoystick = 4;
-        public static final int rightJoystick = 5;
+        public static final int leftJoystick = 0;
+        public static final int rightJoystick = 1;
 
         // max output
         public static final double maxOutput = 0.5;
