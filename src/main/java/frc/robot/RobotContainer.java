@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.commands.Drive;
@@ -17,12 +18,12 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 public class RobotContainer {
 
   // left motors
-  private final MotorController upperLeftMotor = (MotorController) new TalonFX(Constants.DriveConstants.upperLeftMotor);
-  private final MotorController lowerLeftMotor = (MotorController) new TalonFX(Constants.DriveConstants.lowerLeftMotor);
+  private final MotorController upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.upperLeftMotor);
+  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.lowerLeftMotor);
 
   // right motors
-  private final MotorController upperRightMotor = (MotorController) new TalonFX(Constants.DriveConstants.upperRightMotor);
-  private final MotorController lowerRightMotor = (MotorController) new TalonFX(Constants.DriveConstants.lowerRightMotor);
+  private final MotorController upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.upperRightMotor);
+  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.lowerRightMotor);
 
   // The motors on the left side of the drive.
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
