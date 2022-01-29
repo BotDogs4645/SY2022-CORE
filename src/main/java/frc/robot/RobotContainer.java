@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -33,10 +34,10 @@ public class RobotContainer {
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
   // Initing the Joysticks so that we can pass them to the Drive command
-  public final Joystick driveJoystick = new Joystick(Constants.DriveConstants.driveJoystick);
+  public final XboxController driveController = new XboxController(Constants.DriveConstants.driveController);
 
   // Drive subsystem
-  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveJoystick);
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController);
   
   // Drive command
   public final Drive driveCommand = new Drive(driveSubsystem);

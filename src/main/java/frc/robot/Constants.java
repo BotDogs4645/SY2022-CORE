@@ -19,7 +19,7 @@ public final class Constants {
         public static final int lowerRightMotor = 8;
 
         // joystick ports
-        public static final int driveJoystick = 0;
+        public static final int driveController = 0;
 
         // max output
         public static final double maxOutput = 0.5;
