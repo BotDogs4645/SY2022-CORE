@@ -9,20 +9,20 @@ import frc.robot.subsystems.DriveTrain;
 
 public class Drive extends CommandBase {
 
-  // DriveTrain subsystem to manipulate the DifferentialDrive
   private DriveTrain driveTrainSubsystem;
 
   private WPI_TalonFX encLeftMotor; 
   private WPI_TalonFX encRightMotor;
 
-  // initialize Drive command
-  public Drive(DriveTrain subsystem, MotorController encLeftMotor, MotorController encRightMotor) {
+  private boolean driveEncoders;
+
+  public Drive(DriveTrain subsystem, MotorController encLeftMotor, MotorController encRightMotor, boolean driveEncoders) {
     driveTrainSubsystem = subsystem;
     addRequirements(driveTrainSubsystem);
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
+    this.driveEncoders = driveEncoders;
   }
-
 
   // Called when the command is initially scheduled.
   @Override
@@ -32,8 +32,12 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    driveTrainSubsystem.driveWithJoystick();
-    driveTrainSubsystem.encoderDrive(encLeftMotor, encRightMotor);
+    if(driveEncoders) {
+      driveTrainSubsystem.encoderDrive(encLeftMotor, encRightMotor);
+    }
+    else {
+      driveTrainSubsystem.driveWithJoystick();
+    }
   }
 
   // Called once the command ends or is interrupted.

@@ -16,12 +16,13 @@ import frc.robot.subsystems.DriveTrain;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  boolean driveEncoders = false; // checks to see if button to drive w/encoders is pressed
 
   // tank drive motors
-  public static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.upperLeftMotor);
+  private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.upperLeftMotor);
   private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.lowerLeftMotor);
 
-  public static MotorController upperRightMotor = new WPI_TalonFX(Constants.driveConstants.upperRightMotor);
+  private static MotorController upperRightMotor = new WPI_TalonFX(Constants.driveConstants.upperRightMotor);
   private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.lowerRightMotor);
 
   // tank drive motor groups
@@ -35,7 +36,7 @@ public class RobotContainer {
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController);
 
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem, upperLeftMotor, upperRightMotor);
+  public final Drive driveCommand = new Drive(driveSubsystem, upperLeftMotor, upperRightMotor, driveEncoders);
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -51,6 +52,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
+    // put button here
   }
 }

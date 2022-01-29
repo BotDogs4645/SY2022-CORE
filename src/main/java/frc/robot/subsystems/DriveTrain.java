@@ -32,7 +32,7 @@ public class DriveTrain extends SubsystemBase {
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
-  private double averageDistanceTraveled;
+  private double averageDisplacement;
 
   private static double circumferenceEquation = 2 * Math.PI;
 
@@ -41,7 +41,7 @@ public class DriveTrain extends SubsystemBase {
     this.driveController = driveController;
     this.leftMotors = leftMotors;
     this.rightMotors= rightMotors;
-    averageDistanceTraveled = 0;
+    averageDisplacement = 0;
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.driveConstants.maxOutput);
   }
@@ -56,7 +56,7 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
 
-  public void encoderDrive(WPI_TalonFX encLeftMotor, WPI_TalonFX encRightMotor){ 
+  public void encoderDrive(WPI_TalonFX encLeftMotor, WPI_TalonFX encRightMotor) { // drives 18 ft
     this.encLeftMotor = encLeftMotor;
     this.encRightMotor = encRightMotor;
 
@@ -66,9 +66,19 @@ public class DriveTrain extends SubsystemBase {
     leftDistanceTraveled = getDistance(encLeftMotor, rawEncoderOutLeft);
     rightDistanceTraveled = getDistance(encRightMotor, rawEncoderOutRight);
 
-    averageDistanceTraveled = (leftDistanceTraveled + rightDistanceTraveled) / 2;
+    averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2;
 
-    SmartDashboard.putNumber("Average Distance Traveled", averageDistanceTraveled);
+    leftSpeed = 0.1;
+    rightSpeed = 0.1;
+
+    if(averageDisplacement < 18) { // 18 FT; change to constant; should be continously updating
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+    }
+    if(averageDisplacement > 18) {
+      stop();
+    }
+
+    SmartDashboard.putNumber("Average Distance Traveled", averageDisplacement);
   }
 
   public static double getDistance(WPI_TalonFX encMotor, double rawEncoderOut) {
