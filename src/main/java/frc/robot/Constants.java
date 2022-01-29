@@ -9,7 +9,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final class DriveConstants {
+    public static final class driveConstants {
         // left motor ports
         public static final int upperLeftMotor = 10;
         public static final int lowerLeftMotor = 7;
@@ -19,9 +19,15 @@ public final class Constants {
         public static final int lowerRightMotor = 8;
 
         // joystick ports
-        public static final int driveJoystick = 0;
+        public static final int driveController = 0;
 
         // max output
-        public static final double maxOutput = 0.5;
+        public static final double maxOutput = 0.75;
+    }   
+    public static final class encoderConstants{
+        public static int kUnitsPerRevolution = 2048;
+        public static double wheelRadiusInches = 3;
+
+        public static String messagetoMrBerg = "HI MR BERG :)";
     }
 }

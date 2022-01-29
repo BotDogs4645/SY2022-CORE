@@ -1,36 +1,85 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 public class DriveTrain extends SubsystemBase {
 
   private final DifferentialDrive differentialDriveSub;
 
-  private Joystick driveJoystick;
+  private XboxController driveController;
 
-  private double forward;
-  private double rotation;
+  private double leftSpeed;
+  private double rightSpeed;
+
+  private MotorControllerGroup leftMotors;
+  private MotorControllerGroup rightMotors;
+
+  private WPI_TalonFX encLeftMotor;
+  private WPI_TalonFX encRightMotor;
+
+  private double rawEncoderOutLeft;
+  private double rawEncoderOutRight;
+
+  private double leftDistanceTraveled;
+  private double rightDistanceTraveled;
+
+  private double averageDistanceTraveled;
+
+  private static double circumferenceEquation = 2 * Math.PI;
 
   // initialize Drive subsystem
-  public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveJoystick) {
-    this.driveJoystick = driveJoystick;
+  public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController) {
+    this.driveController = driveController;
+    this.leftMotors = leftMotors;
+    this.rightMotors= rightMotors;
+    averageDistanceTraveled = 0;
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
-    differentialDriveSub.setMaxOutput(Constants.DriveConstants.maxOutput);
+    differentialDriveSub.setMaxOutput(Constants.driveConstants.maxOutput);
   }
 
   public void driveWithJoystick() {
-    forward = driveJoystick.getY();
-    rotation = driveJoystick.getX();
+    leftSpeed = driveController.getLeftY();
+    rightSpeed = driveController.getRightY();
+
+    SmartDashboard.putNumber("Left Speed", leftMotors.get());
+    SmartDashboard.putNumber("Right Speed", rightMotors.get());
     
-    differentialDriveSub.arcadeDrive(forward, -rotation); // should never exceed 0.5 bc of max output
+    differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+  }
+
+  public void encoderDrive(WPI_TalonFX encLeftMotor, WPI_TalonFX encRightMotor){ 
+    this.encLeftMotor = encLeftMotor;
+    this.encRightMotor = encRightMotor;
+
+    rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
+    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition();
+
+    leftDistanceTraveled = getDistance(encLeftMotor, rawEncoderOutLeft);
+    rightDistanceTraveled = getDistance(encRightMotor, rawEncoderOutRight);
+
+    averageDistanceTraveled = (leftDistanceTraveled + rightDistanceTraveled) / 2;
+
+    SmartDashboard.putNumber("Average Distance Traveled", averageDistanceTraveled);
+  }
+
+  public static double getDistance(WPI_TalonFX encMotor, double rawEncoderOut) {
+    double mRevolutionsConversion = rawEncoderOut / Constants.encoderConstants.kUnitsPerRevolution;
+    double mRevolutionsPerFoot = 12 / (Constants.encoderConstants.wheelRadiusInches * circumferenceEquation); // inches per foot / circumference
+    return mRevolutionsConversion / mRevolutionsPerFoot;
   }
 
   public void stop() {
-    forward = 0;
-    rotation = 0;
-    differentialDriveSub.arcadeDrive(forward, -rotation);
+    leftSpeed = 0;
+    rightSpeed = 0;
+    differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
 }

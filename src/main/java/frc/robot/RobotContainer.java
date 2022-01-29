@@ -1,14 +1,13 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.Joystick;
-import frc.robot.commands.Drive;
-import frc.robot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.Drive;
+import frc.robot.subsystems.DriveTrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,36 +17,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RobotContainer {
 
-  // left motors
-  private final MotorController upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.upperLeftMotor);
-  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.lowerLeftMotor);
+  // tank drive motors
+  public static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.upperLeftMotor);
+  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.lowerLeftMotor);
 
-  // right motors
-  private final MotorController upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.upperRightMotor);
-  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.lowerRightMotor);
+  public static MotorController upperRightMotor = new WPI_TalonFX(Constants.driveConstants.upperRightMotor);
+  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.lowerRightMotor);
 
-  // The motors on the left side of the drive.
+  // tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
-
-  // The motors on the right side of the drive.
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
-  // Initing the Joysticks so that we can pass them to the Drive command
-  public final Joystick driveJoystick = new Joystick(Constants.DriveConstants.driveJoystick);
+  // initing the Joysticks so that we can pass them to the Drive command
+  public final XboxController driveController = new XboxController(Constants.driveConstants.driveController);
 
-  // Drive subsystem
-  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveJoystick);
-  
-  // Drive command
-  public final Drive driveCommand = new Drive(driveSubsystem);
+  // subsystems
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController);
+
+  // commands
+  public final Drive driveCommand = new Drive(driveSubsystem, upperLeftMotor, upperRightMotor);
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    //invert right side of the drive train
     leftMotors.setInverted(true);
-    driveSubsystem.setDefaultCommand(driveCommand);
-    // Configure the button bindings
     configureButtonBindings();
+    driveSubsystem.setDefaultCommand(driveCommand);
   }
 
   /**
@@ -56,5 +50,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+
+  }
 }

@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
@@ -42,7 +41,9 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     SmartDashboard.putData(CommandScheduler.getInstance());
-    SmartDashboard.putNumber("Joystick Axis", m_robotContainer.driveJoystick.getY());
+
+    SmartDashboard.putNumber("Gamepad Left Y Axis", m_robotContainer.driveController.getLeftY());
+    SmartDashboard.putNumber("Gamepad Right Y Axis", m_robotContainer.driveController.getRightY());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -62,6 +63,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //double rawEncoderOut = ((BaseMotorController) RobotContainer.upperLeftMotor).getSelectedSensorPosition();
   }
 
   @Override
