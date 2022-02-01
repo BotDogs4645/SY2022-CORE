@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.DriveTrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -44,7 +45,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     SmartDashboard.putNumber("Gamepad Left Y Axis", m_robotContainer.driveController.getLeftY());
-    SmartDashboard.putNumber("Gamepad Right Y Axis", m_robotContainer.driveController.getRightY());
+    SmartDashboard.putNumber("Drive Mode", DriveTrain.driveMode);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

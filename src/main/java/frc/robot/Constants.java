@@ -22,6 +22,6 @@ public final class Constants {
         public static final int driveController = 0;
 
         // max output
-        public static final double maxOutput = 0.5;
+        public static final double maxOutput = 0.75;
     }
 }
