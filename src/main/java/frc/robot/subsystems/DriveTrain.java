@@ -56,7 +56,13 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
 
-  public void encoderDrive(WPI_TalonFX encLeftMotor, WPI_TalonFX encRightMotor) { // drives 18 ft
+  public static double getDistance(WPI_TalonFX encMotor, double rawEncoderOut) {
+    double mRevolutionsConversion = rawEncoderOut / Constants.encoderConstants.kUnitsPerRevolution;
+    double mRevolutionsPerFoot = 12 / (Constants.encoderConstants.wheelRadiusInches * circumferenceEquation); // inches per foot / circumference
+    return mRevolutionsConversion / mRevolutionsPerFoot;
+  }
+
+  public void getAverageDisplacement(WPI_TalonFX encLeftMotor, WPI_TalonFX encRightMotor) {
     this.encLeftMotor = encLeftMotor;
     this.encRightMotor = encRightMotor;
 
@@ -67,24 +73,20 @@ public class DriveTrain extends SubsystemBase {
     rightDistanceTraveled = getDistance(encRightMotor, rawEncoderOutRight);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2;
-
-    leftSpeed = 0.1;
-    rightSpeed = 0.1;
-
-    if(averageDisplacement < 18) { // 18 FT; change to constant; should be continously updating
-      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
-    }
-    if(averageDisplacement > 18) {
-      stop();
-    }
-
-    SmartDashboard.putNumber("Average Distance Traveled", averageDisplacement);
   }
 
-  public static double getDistance(WPI_TalonFX encMotor, double rawEncoderOut) {
-    double mRevolutionsConversion = rawEncoderOut / Constants.encoderConstants.kUnitsPerRevolution;
-    double mRevolutionsPerFoot = 12 / (Constants.encoderConstants.wheelRadiusInches * circumferenceEquation); // inches per foot / circumference
-    return mRevolutionsConversion / mRevolutionsPerFoot;
+  public void encoderDrive() { // drives 18 ft
+    leftSpeed = 0.2;
+    rightSpeed = 0.2;
+
+    while(averageDisplacement < 18) { // 18 FT; change to constant; should be continously updating
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+      getAverageDisplacement(encLeftMotor, encRightMotor); // update avgDisplacement
+    }
+
+    stop();
+
+    SmartDashboard.putNumber("Average Distance Traveled", averageDisplacement);
   }
 
   public void stop() {

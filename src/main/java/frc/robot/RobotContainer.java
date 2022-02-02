@@ -2,11 +2,13 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
@@ -18,8 +20,6 @@ import frc.robot.subsystems.DriveTrain;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  boolean driveEncoders = false; // checks to see if button to drive w/encoders is pressed
-
   // tank drive motors
   private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.upperLeftMotor);
   private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.lowerLeftMotor);
@@ -39,8 +39,8 @@ public class RobotContainer {
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController);
 
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem, upperLeftMotor, upperRightMotor, driveEncoders);
-  
+  public final Drive driveCommand = new Drive(driveSubsystem);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     leftMotors.setInverted(true);
@@ -55,8 +55,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    driveEncoders = true;
-    encoderButton.whenPressed(new Drive(driveSubsystem, upperLeftMotor, upperRightMotor, driveEncoders));
+    encoderButton.whenPressed((Command) new Encoder(driveSubsystem, upperRightMotor, upperLeftMotor));
     encoderButton.cancelWhenPressed(driveCommand);
   }
 }

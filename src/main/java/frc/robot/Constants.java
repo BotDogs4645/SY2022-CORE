@@ -32,6 +32,6 @@ public final class Constants {
 
         public static String messagetoMrBerg = "HI MR BERG :)";
 
-        public static int encoderButton = 0;
+        public static int encoderButton = 1;
     }
 }
