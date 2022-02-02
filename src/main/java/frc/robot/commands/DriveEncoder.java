@@ -4,16 +4,14 @@
 
 package frc.robot.commands;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
-public class Encoder extends CommandBase {
+public class DriveEncoder extends CommandBase {
   
   private DriveTrain driveTrainSubsystem;
 
-  public Encoder(DriveTrain subsystem, WPI_TalonFX encLeft, WPI_TalonFX encRight) {
+  public DriveEncoder(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
     addRequirements(driveTrainSubsystem);
   }
@@ -24,7 +22,9 @@ public class Encoder extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    driveTrainSubsystem.encoderDrive();
+  }
 
   // Called once the command ends or is interrupted.
   @Override

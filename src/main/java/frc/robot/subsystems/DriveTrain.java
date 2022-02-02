@@ -1,16 +1,13 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 public class DriveTrain extends SubsystemBase {
 
   private final DifferentialDrive differentialDriveSub;
@@ -78,14 +75,11 @@ public class DriveTrain extends SubsystemBase {
   public void encoderDrive() { // drives 18 ft
     leftSpeed = 0.2;
     rightSpeed = 0.2;
-
     while(averageDisplacement < 18) { // 18 FT; change to constant; should be continously updating
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
       getAverageDisplacement(encLeftMotor, encRightMotor); // update avgDisplacement
     }
-
     stop();
-
     SmartDashboard.putNumber("Average Distance Traveled", averageDisplacement);
   }
 
