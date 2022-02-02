@@ -23,13 +23,19 @@ public final class Constants {
 
         // max output
         public static final double maxOutput = 0.75;
-    }   
-    public static final class encoderConstants{
+    }  
+
+    public static final class encoderConstants {
+        public static String messagetoMrBerg = "HI MR BERG :)";
+
+        // wheel constants
         public static int kUnitsPerRevolution = 2048;
         public static double wheelRadiusInches = 3;
 
-        public static String messagetoMrBerg = "HI MR BERG :)";
+        // button bindings
+        public static int encoderButton = 2;
 
-        public static int encoderButton = 1;
+        // target distance for autonomous
+        public static int targetDistanceFeet = 18; // temporary for testing purposes
     }
 }

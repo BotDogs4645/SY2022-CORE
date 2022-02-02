@@ -20,6 +20,8 @@ public class DriveTrain extends SubsystemBase {
   private MotorControllerGroup leftMotors;
   private MotorControllerGroup rightMotors;
 
+  public boolean driveWithEncoders = false; 
+
   private WPI_TalonFX encLeftMotor;
   private WPI_TalonFX encRightMotor;
 
@@ -29,7 +31,7 @@ public class DriveTrain extends SubsystemBase {
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
-  private double averageDisplacement;
+  private double averageDisplacement = 0;
 
   private static double circumferenceEquation = 2 * Math.PI;
 
@@ -38,7 +40,7 @@ public class DriveTrain extends SubsystemBase {
     this.driveController = driveController;
     this.leftMotors = leftMotors;
     this.rightMotors= rightMotors;
-    averageDisplacement = 0;
+
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.driveConstants.maxOutput);
   }
@@ -59,10 +61,7 @@ public class DriveTrain extends SubsystemBase {
     return mRevolutionsConversion / mRevolutionsPerFoot;
   }
 
-  public void getAverageDisplacement(WPI_TalonFX encLeftMotor, WPI_TalonFX encRightMotor) {
-    this.encLeftMotor = encLeftMotor;
-    this.encRightMotor = encRightMotor;
-
+  public void getAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition();
 
@@ -75,12 +74,17 @@ public class DriveTrain extends SubsystemBase {
   public void encoderDrive() { // drives 18 ft
     leftSpeed = 0.2;
     rightSpeed = 0.2;
-    while(averageDisplacement < 18) { // 18 FT; change to constant; should be continously updating
+
+    while(averageDisplacement < Constants.encoderConstants.targetDistanceFeet) { // 18 FT;
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
-      getAverageDisplacement(encLeftMotor, encRightMotor); // update avgDisplacement
+      getAverageDisplacement(); // updates avgDisplacement
     }
+    
     stop();
+
     SmartDashboard.putNumber("Average Distance Traveled", averageDisplacement);
+
+    driveWithEncoders = false; // resets the button bindings so user doesn't have to
   }
 
   public void stop() {

@@ -32,20 +32,19 @@ public class RobotContainer {
 
   // initing the Joysticks so that we can pass them to the Drive command
   public final XboxController driveController = new XboxController(Constants.driveConstants.driveController);
-  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.encoderButton);
+  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.encoderButton); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the command
 
   // subsystems
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController);
 
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
-  public final DriveEncoder encoderCommand = new DriveEncoder(driveSubsystem);
-
+  
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     leftMotors.setInverted(true);
-    configureButtonBindings();
     driveSubsystem.setDefaultCommand(driveCommand);
+    configureButtonBindings();
   }
 
   /**
@@ -56,7 +55,6 @@ public class RobotContainer {
    */
 
   private void configureButtonBindings() {
-    encoderButton.whenPressed((Command) encoderCommand);
-    encoderButton.cancelWhenPressed(driveCommand);
+    encoderButton.whenPressed(new DriveEncoder(driveSubsystem));
   }
 }

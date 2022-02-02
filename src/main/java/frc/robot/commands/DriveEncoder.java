@@ -23,7 +23,7 @@ public class DriveEncoder extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveTrainSubsystem.encoderDrive();
+    driveTrainSubsystem.driveWithEncoders = true;
   }
 
   // Called once the command ends or is interrupted.
@@ -32,7 +32,7 @@ public class DriveEncoder extends CommandBase {
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
-    return false;
+  public boolean isFinished() { // deschedules command as soon as the drive mode is changed
+    return true;
   }
 }
