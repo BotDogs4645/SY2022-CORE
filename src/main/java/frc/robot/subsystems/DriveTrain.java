@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,8 +21,7 @@ public class DriveTrain extends SubsystemBase {
   private MotorControllerGroup leftMotors;
   private MotorControllerGroup rightMotors;
 
-  public boolean driveWithEncoders = false; 
-
+  // encoder variables:
   private WPI_TalonFX encLeftMotor;
   private WPI_TalonFX encRightMotor;
 
@@ -31,18 +31,29 @@ public class DriveTrain extends SubsystemBase {
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
-  private double averageDisplacement = 0;
-
-  private static double circumferenceEquation = 2 * Math.PI;
-
   // initialize Drive subsystem
-  public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController) {
+  public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
+
     this.leftMotors = leftMotors;
     this.rightMotors= rightMotors;
 
+    this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
+    this.encRightMotor = (WPI_TalonFX) encRightMotor;
+
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
+
     differentialDriveSub.setMaxOutput(Constants.driveConstants.maxOutput);
+  }
+
+  public double getAverageDisplacement() { // still needs to account for margin of error
+    rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
+    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition();
+
+    leftDistanceTraveled = Constants.encoderConstants.encoderDistancePerPulse * rawEncoderOutLeft;
+    rightDistanceTraveled = Constants.encoderConstants.encoderDistancePerPulse * rawEncoderOutRight;
+
+    return (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
   }
 
   public void driveWithJoystick() {
@@ -51,40 +62,10 @@ public class DriveTrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Left Speed", leftMotors.get());
     SmartDashboard.putNumber("Right Speed", rightMotors.get());
+
+    SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
     
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
-  }
-
-  public static double getDistance(WPI_TalonFX encMotor, double rawEncoderOut) {
-    double mRevolutionsConversion = rawEncoderOut / Constants.encoderConstants.kUnitsPerRevolution;
-    double mRevolutionsPerFoot = 12 / (Constants.encoderConstants.wheelRadiusInches * circumferenceEquation); // inches per foot / circumference
-    return mRevolutionsConversion / mRevolutionsPerFoot;
-  }
-
-  public void getAverageDisplacement() { // still needs to account for margin of error
-    rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
-    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition();
-
-    leftDistanceTraveled = getDistance(encLeftMotor, rawEncoderOutLeft);
-    rightDistanceTraveled = getDistance(encRightMotor, rawEncoderOutRight);
-
-    averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2;
-  }
-
-  public void encoderDrive() { // drives 18 ft
-    leftSpeed = 0.2;
-    rightSpeed = 0.2;
-
-    while(averageDisplacement < Constants.encoderConstants.targetDistanceFeet) { // 18 FT;
-      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
-      getAverageDisplacement(); // updates avgDisplacement
-    }
-    
-    stop();
-
-    SmartDashboard.putNumber("Average Distance Traveled", averageDisplacement);
-
-    driveWithEncoders = false; // resets the button bindings so user doesn't have to
   }
 
   public void stop() {

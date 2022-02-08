@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
@@ -21,16 +20,7 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    SmartDashboard.putBoolean("DriveTrain toggled to: ", driveTrainSubsystem.driveWithEncoders);
-
-    if (driveTrainSubsystem.driveWithEncoders) { // if true
-      driveTrainSubsystem.encoderDrive();
-    }
-    
-    else { // if encoders are not enabled, drive manually
-      driveTrainSubsystem.driveWithJoystick();
-    }
-
+    driveTrainSubsystem.driveWithJoystick();
   }
 
   // Called once the command ends or is interrupted.
