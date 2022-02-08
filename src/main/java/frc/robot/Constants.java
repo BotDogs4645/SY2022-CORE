@@ -22,6 +22,27 @@ public final class Constants {
         public static final int driveController = 0;
 
         // max output
-        public static final double maxOutput = 0.5;
+        public static final double maxOutput = 0.75;
+    }
+
+    public static final class ShooterConstants {
+        public static final int loaderMotor = 11;
+        public static final int shootMotor = 12;
+        //0.1, 0.00014, 0.12
+        public static final double kP = 0.1;
+        public static final double kI = 0.00014;
+        public static final double kD = 0.12;
+
+        public static final double shooterTolerance = 5/60;
+        public static final double shooterRPMSetpoint = 6;
+
+        public static final double MAX_VOLT = 12;
+        public static final double MAX_RPM = 6380;
+
+        public static final double loaderPercentOut = .3;
+
+        // the max speed in RPM that the Falcon 500 can spin at
+        public static final int FALCON_MAX_RPM = 6380;
+        public static final int CONVERT_RPM = Constants.ShooterConstants.FALCON_MAX_RPM * 2048 / 600;
     }
 }

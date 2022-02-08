@@ -23,7 +23,13 @@ public class Drive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveTrainSubsystem.driveWithJoystick();
+    if (DriveTrain.driveMode == 0) {
+      driveTrainSubsystem.driveWithJoystick();
+    } else if (DriveTrain.driveMode == 1) {
+      //driveTrainSubsystem.trackObject();
+      //driveTrainSubsystem.getDistance();
+    }
+    
   }
 
   // Called once the command ends or is interrupted.
