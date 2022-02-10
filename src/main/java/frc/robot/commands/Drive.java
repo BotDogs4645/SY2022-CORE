@@ -20,7 +20,10 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    driveTrainSubsystem.driveWithJoystick();
+    //driveTrainSubsystem.driveWithJoystick();
+
+    driveTrainSubsystem.driveWithEncoders = true;
+    driveTrainSubsystem.encoderDrive();
   }
 
   // Called once the command ends or is interrupted.

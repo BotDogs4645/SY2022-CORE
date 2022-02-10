@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 public class DriveTrain extends SubsystemBase {
@@ -29,8 +30,7 @@ public class DriveTrain extends SubsystemBase {
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight;
 
-  private double leftDistanceTraveled;
-  private double rightDistanceTraveled;
+  public boolean driveWithEncoders = false;
 
   // initialize Drive subsystem
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController, MotorController encLeftMotor, MotorController encRightMotor) {
@@ -74,12 +74,31 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Left Speed", leftMotors.get());
     SmartDashboard.putNumber("Right Speed", rightMotors.get());
 
-    SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
+    // SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
+
+    // SmartDashboard.putNumber("raw encoder Left", rawEncoderOutLeft);
+    // SmartDashboard.putNumber("raw encoder Right", rawEncoderOutRight);
+    
+    differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+  }
+
+  public void encoderDrive(){
+    leftSpeed = Constants.encoderConstants.leftSpeed * -1;
+    rightSpeed = Constants.encoderConstants.rightSpeed * -1;
 
     SmartDashboard.putNumber("raw encoder Left", rawEncoderOutLeft);
     SmartDashboard.putNumber("raw encoder Right", rawEncoderOutRight);
-    
-    differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+
+    SmartDashboard.putNumber("left sped:", leftSpeed);
+   
+    if(getAverageDisplacement() < Constants.encoderConstants.targetDistanceFt) {
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+      SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
+    } 
+
+    //stop();
+
+    driveWithEncoders = false; // resets the button bindings so user doesn't have to
   }
 
   public void stop() {

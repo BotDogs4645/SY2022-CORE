@@ -33,6 +33,12 @@ public final class Constants {
         public static double revolutionsPerFoot = 1 / wheelDiameterFeet * Math.PI;
 
         // target distance for autonomous
-        public static int targetDistanceMeters = 5; // temporary for testing purposes
+        public static int targetDistanceFt = 15; // temporary for testing purposes
+
+        public static double leftSpeed = 0.4;
+        public static double rightSpeed = 0.4;
+
+        public static int encoderButton = 2;
+
     }
 }

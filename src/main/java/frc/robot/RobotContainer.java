@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
 
@@ -29,6 +30,7 @@ public class RobotContainer {
 
   // initing the Joysticks so that we can pass them to the Drive command
   public final XboxController driveController = new XboxController(Constants.driveConstants.driveController);
+  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.encoderButton); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
 
   // subsystems
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
@@ -40,7 +42,7 @@ public class RobotContainer {
   public RobotContainer() {
     leftMotors.setInverted(true);
     rightMotors.setInverted(false);
-    driveSubsystem.setDefaultCommand(driveCommand);
+    //driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
@@ -51,5 +53,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
 
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    encoderButton.whenPressed(new Drive(driveSubsystem));
+  }
 }
