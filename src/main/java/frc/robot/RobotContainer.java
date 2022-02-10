@@ -39,6 +39,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     leftMotors.setInverted(true);
+    rightMotors.setInverted(false);
     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }

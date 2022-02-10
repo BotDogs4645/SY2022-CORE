@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -41,6 +42,13 @@ public class DriveTrain extends SubsystemBase {
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
 
+    this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+
+    //reset encoders
+    this.encLeftMotor.setSelectedSensorPosition(0);
+    this.encRightMotor.setSelectedSensorPosition(0);
+
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
 
     differentialDriveSub.setMaxOutput(Constants.driveConstants.maxOutput);
@@ -48,11 +56,14 @@ public class DriveTrain extends SubsystemBase {
 
   public double getAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
-    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition();
+    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
-    leftDistanceTraveled = Constants.encoderConstants.encoderDistancePerPulse * rawEncoderOutLeft;
-    rightDistanceTraveled = Constants.encoderConstants.encoderDistancePerPulse * rawEncoderOutRight;
+    // double mRevolutionsConversionLeft = rawEncoderOutLeft / Constants.encoderConstants.kUnitsPerRevolution;
+    // double mRevolutionsConversionRight = rawEncoderOutRight / Constants.encoderConstants.kUnitsPerRevolution;
 
+    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.kUnitsPerRevolution * Constants.encoderConstants.revolutionsPerFoot);
+    double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.kUnitsPerRevolution * Constants.encoderConstants.revolutionsPerFoot);
+    
     return (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
   }
 
@@ -64,6 +75,9 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Right Speed", rightMotors.get());
 
     SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
+
+    SmartDashboard.putNumber("raw encoder Left", rawEncoderOutLeft);
+    SmartDashboard.putNumber("raw encoder Right", rawEncoderOutRight);
     
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }

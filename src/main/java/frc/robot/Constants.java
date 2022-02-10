@@ -28,9 +28,9 @@ public final class Constants {
     public static final class encoderConstants {
         // wheel constants
         public static int kUnitsPerRevolution = 2048;
-        public static double wheelDiameterMeter = 0.1524; // 6 inches 
+        public static double wheelDiameterFeet = 0.5; // 6 inches
 
-        public static double encoderDistancePerPulse = (wheelDiameterMeter * Math.PI) / kUnitsPerRevolution;
+        public static double revolutionsPerFoot = 1 / wheelDiameterFeet * Math.PI;
 
         // target distance for autonomous
         public static int targetDistanceMeters = 5; // temporary for testing purposes
