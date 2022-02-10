@@ -1,14 +1,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
 public class Drive extends CommandBase {
 
   private DriveTrain driveTrainSubsystem;
 
-  public Drive(DriveTrain subsystem) {
+  private int driveMode;
+
+  public Drive(DriveTrain subsystem, int driveMode) {
     driveTrainSubsystem = subsystem;
+    this.driveMode = driveMode;
     addRequirements(driveTrainSubsystem);
   }
 
@@ -20,10 +24,20 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    //driveTrainSubsystem.driveWithJoystick();
-
-    driveTrainSubsystem.driveWithEncoders = true;
-    driveTrainSubsystem.encoderDrive();
+    if(driveMode == Constants.driveModeConstants.joystickDrive) {
+      driveTrainSubsystem.driveWithJoystick();
+    }
+    else if(driveMode == Constants.driveModeConstants.limelightDrive) {
+      // limelight
+    }
+    else {
+      if(driveTrainSubsystem.encoderDrive() == false) { // if the encoders have not yet reached target distance
+        driveTrainSubsystem.encoderDrive();
+      }
+      else {
+        driveMode = Constants.driveModeConstants.joystickDrive; // toggle back to manual
+      }
+    }
   }
 
   // Called once the command ends or is interrupted.

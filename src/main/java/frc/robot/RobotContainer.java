@@ -17,6 +17,8 @@ import frc.robot.subsystems.DriveTrain;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private int driveMode = Constants.driveModeConstants.joystickDrive; 
+
   // tank drive motors
   private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.upperLeftMotor);
   private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.lowerLeftMotor);
@@ -36,13 +38,13 @@ public class RobotContainer {
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
 
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem);
+  public final Drive driveCommand = new Drive(driveSubsystem, driveMode);
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     leftMotors.setInverted(true);
     rightMotors.setInverted(false);
-    //driveSubsystem.setDefaultCommand(driveCommand);
+    driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
@@ -54,6 +56,6 @@ public class RobotContainer {
    */
 
   private void configureButtonBindings() {
-    encoderButton.whenPressed(new Drive(driveSubsystem));
+    encoderButton.whenPressed(new Drive(driveSubsystem, Constants.driveModeConstants.encoderDrive)); 
   }
 }

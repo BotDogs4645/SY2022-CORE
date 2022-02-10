@@ -9,6 +9,12 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static final class driveModeConstants {
+        public static int joystickDrive = 0;
+        public static int limelightDrive = 1;
+        public static int encoderDrive = 2;
+    }
+
     public static final class driveConstants {
         // left motor ports
         public static final int upperLeftMotor = 10;
@@ -33,12 +39,11 @@ public final class Constants {
         public static double revolutionsPerFoot = 1 / wheelDiameterFeet * Math.PI;
 
         // target distance for autonomous
-        public static int targetDistanceFt = 15; // temporary for testing purposes
+        public static double targetDistanceFt = 8.46; // the distance from the field to the bottom of the vision tape
 
         public static double leftSpeed = 0.4;
         public static double rightSpeed = 0.4;
 
         public static int encoderButton = 2;
-
     }
 }
