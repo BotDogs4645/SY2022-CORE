@@ -27,7 +27,7 @@ public class Drive extends CommandBase {
       // limelight code
     }
     else if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.ENCODER_DRIVE){
-      if(driveTrainSubsystem.encoderDrive() == false) { // while encoders have not yet reached target distance
+      if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
         driveTrainSubsystem.encoderDrive();
       }
       else {
