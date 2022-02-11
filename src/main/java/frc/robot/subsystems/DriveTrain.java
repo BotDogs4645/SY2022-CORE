@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase {
-
+  
+  public static int driveMode;
+    
   private final DifferentialDrive differentialDriveSub;
 
   private XboxController driveController;
@@ -46,6 +48,8 @@ public class DriveTrain extends SubsystemBase {
     //reset encoders
     this.encLeftMotor.setSelectedSensorPosition(0);
     this.encRightMotor.setSelectedSensorPosition(0);
+    
+    driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE;
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
 
