@@ -17,22 +17,22 @@ import frc.robot.subsystems.DriveTrain;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private int driveMode = Constants.driveModeConstants.joystickDrive; 
+  private int driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; 
 
   // tank drive motors
-  private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.upperLeftMotor);
-  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.lowerLeftMotor);
+  private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
+  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
 
-  private static MotorController upperRightMotor = new WPI_TalonFX(Constants.driveConstants.upperRightMotor);
-  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.lowerRightMotor);
+  private static MotorController upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
+  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
 
   // tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
   // initing the Joysticks so that we can pass them to the Drive command
-  public final XboxController driveController = new XboxController(Constants.driveConstants.driveController);
-  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.encoderButton); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
+  public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER);
+  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.ENCODER_BUTTON); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
 
   // subsystems
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
@@ -46,7 +46,7 @@ public class RobotContainer {
     rightMotors.setInverted(false);
     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
-  }
+  }   
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -56,6 +56,6 @@ public class RobotContainer {
    */
 
   private void configureButtonBindings() {
-    encoderButton.whenPressed(new Drive(driveSubsystem, Constants.driveModeConstants.encoderDrive)); 
+    encoderButton.whenPressed(new Drive(driveSubsystem, Constants.driveModeConstants.ENCODER_DRIVE)); 
   }
 }

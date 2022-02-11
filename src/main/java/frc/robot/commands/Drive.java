@@ -24,21 +24,21 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    if(driveMode == Constants.driveModeConstants.joystickDrive) {
+    if(driveMode == Constants.driveModeConstants.JOYSTICK_DRIVE) {
       driveTrainSubsystem.driveWithJoystick();
     }
-    else if(driveMode == Constants.driveModeConstants.limelightDrive) {
+    else if(driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) {
       // limelight
     }
-    else {
+    else if(driveMode == Constants.driveModeConstants.ENCODER_DRIVE){
       if(driveTrainSubsystem.encoderDrive() == false) { // if the encoders have not yet reached target distance
         driveTrainSubsystem.encoderDrive();
       }
-      else {
-        driveMode = Constants.driveModeConstants.joystickDrive; // toggle back to manual
+    }
+    else {
+        driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // toggle back to manual
       }
     }
-  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -53,3 +53,4 @@ public class Drive extends CommandBase {
   }
 }
     
+

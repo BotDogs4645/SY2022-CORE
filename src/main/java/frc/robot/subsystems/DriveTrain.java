@@ -49,15 +49,15 @@ public class DriveTrain extends SubsystemBase {
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
 
-    differentialDriveSub.setMaxOutput(Constants.driveConstants.maxOutput);
+    differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
   }
 
   public double getAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
-    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.kUnitsPerRevolution * Constants.encoderConstants.revolutionsPerFoot);
-    double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.kUnitsPerRevolution * Constants.encoderConstants.revolutionsPerFoot);
+    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
+    double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
     
     return (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
   }
@@ -73,15 +73,15 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public boolean encoderDrive() {
-    leftSpeed = Constants.encoderConstants.leftSpeed * -1;
-    rightSpeed = Constants.encoderConstants.rightSpeed * -1;
+    leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
+    rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
    
-    if(getAverageDisplacement() < Constants.encoderConstants.targetDistanceFt) {
+    if(getAverageDisplacement() < Constants.encoderConstants.TARGET_DISTANCEFT) {
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
       SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
     }
 
-    return getAverageDisplacement() < Constants.encoderConstants.targetDistanceFt; 
+    return getAverageDisplacement() < Constants.encoderConstants.TARGET_DISTANCEFT; 
   }
 
   public void stop() {
