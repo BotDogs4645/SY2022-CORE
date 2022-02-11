@@ -10,9 +10,8 @@ public class Drive extends CommandBase {
 
   private int driveMode;
 
-  public Drive(DriveTrain subsystem, int driveMode) {
+  public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
-    this.driveMode = driveMode;
     addRequirements(driveTrainSubsystem);
   }
 
@@ -24,21 +23,21 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    if(driveMode == Constants.driveModeConstants.JOYSTICK_DRIVE) {
-      driveTrainSubsystem.driveWithJoystick();
+    if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) {
+      // limelight code
     }
-    else if(driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) {
-      // limelight
-    }
-    else if(driveMode == Constants.driveModeConstants.ENCODER_DRIVE){
-      if(driveTrainSubsystem.encoderDrive() == false) { // if the encoders have not yet reached target distance
+    else if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.ENCODER_DRIVE){
+      if(driveTrainSubsystem.encoderDrive() == false) { // while encoders have not yet reached target distance
         driveTrainSubsystem.encoderDrive();
+      }
+      else {
+        driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       }
     }
     else {
-        driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // toggle back to manual
-      }
+      driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // default drive mode is manual joystick (driveMode == 0)
     }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
