@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ChangeDriveMode;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
 
@@ -30,15 +31,15 @@ public class RobotContainer {
 
   // initing the Joysticks so that we can pass them to the Drive command
   public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER);
-  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.ENCODER_BUTTON); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
+  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.gamepadButtons.ENCODER_BUTTON); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
 
   // subsystems
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
 
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
-  public final Drive changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.JOYSTICK_DRIVE); // default drive mode is manual joystick
-  
+  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.JOYSTICK_DRIVE); // default drive mode is manual joystick
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     leftMotors.setInverted(true);

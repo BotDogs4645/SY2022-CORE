@@ -9,6 +9,10 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static final class gamepadButtons {
+        public static int ENCODER_BUTTON = 2;
+    }
+
     public static final class driveModeConstants {
         public static int JOYSTICK_DRIVE = 0;
         public static int LIMELIGHT_DRIVE = 1;
@@ -43,7 +47,5 @@ public final class Constants {
 
         public static double LEFT_SPEED = 0.4;
         public static double RIGHT_SPEED = 0.4;
-
-        public static int ENCODER_BUTTON = 2;
     }
 }

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
@@ -7,8 +8,6 @@ import frc.robot.subsystems.DriveTrain;
 public class Drive extends CommandBase {
 
   private DriveTrain driveTrainSubsystem;
-
-  private int driveMode;
 
   public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
@@ -23,19 +22,21 @@ public class Drive extends CommandBase {
   @Override
 
   public void execute() {
-    if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) {
+    SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
+
+    if(DriveTrain.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) { // 1
       // limelight code
     }
-    else if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.ENCODER_DRIVE){
+    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE){ // 2
       if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
         driveTrainSubsystem.encoderDrive();
       }
       else {
-        driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+        DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       }
     }
-    else {
-      driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // default drive mode is manual joystick (driveMode == 0)
+    else { // 0
+      DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // default drive mode is manual joystick (driveMode == 0)
     }
   }
 

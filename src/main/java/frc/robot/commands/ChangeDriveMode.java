@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
 public class ChangeDriveMode extends CommandBase {
@@ -25,7 +24,7 @@ public class ChangeDriveMode extends CommandBase {
   @Override
 
   public void execute() {
-    driveTrainSubsystem.driveMode = driveMode; // change driveMode varibale in subsystem
+    DriveTrain.driveMode = driveMode; // change driveMode varibale in subsystem
     CommandScheduler.getInstance().cancel(this);
   }
 
