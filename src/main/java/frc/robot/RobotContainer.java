@@ -1,15 +1,14 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.Drive;
-import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.Drive;
+import frc.robot.subsystems.DriveTrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,38 +17,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  // tank drive motors
+  private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
+  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
 
-  // left motors
-  private final MotorController upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.upperLeftMotor);
-  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.lowerLeftMotor);
+  private static MotorController upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
+  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
 
-  // right motors
-  private final MotorController upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.upperRightMotor);
-  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.lowerRightMotor);
-
-  // The motors on the left side of the drive.
+  // tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
-
-  // The motors on the right side of the drive.
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
-  // Initing the Joysticks so that we can pass them to the Drive command
-  public final XboxController driveController = new XboxController(Constants.DriveConstants.driveController);
+  // initing the Joysticks so that we can pass them to the Drive command
+  public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER);
+  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.encoderConstants.ENCODER_BUTTON); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
 
-  // Drive subsystem
-  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController);
-  
-  // Drive command
+  // subsystems
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
+
+  // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
+  public final Drive changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.JOYSTICK_DRIVE); // default drive mode is manual joystick
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    //invert right side of the drive train
     leftMotors.setInverted(true);
+    rightMotors.setInverted(false);
     driveSubsystem.setDefaultCommand(driveCommand);
-    // Configure the button bindings
     configureButtonBindings();
-  }
+  }   
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -57,5 +53,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+
+  private void configureButtonBindings() {
+    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.ENCODER_DRIVE)); // change drive mode to encoder
+  }
 }
