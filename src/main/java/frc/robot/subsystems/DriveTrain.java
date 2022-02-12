@@ -14,6 +14,8 @@ import frc.robot.Constants;
 public class DriveTrain extends SubsystemBase {
   
   public static int driveMode;
+
+  private double averageDisplacement;
     
   private final DifferentialDrive differentialDriveSub;
 
@@ -48,6 +50,9 @@ public class DriveTrain extends SubsystemBase {
     //reset encoders
     this.encLeftMotor.setSelectedSensorPosition(0);
     this.encRightMotor.setSelectedSensorPosition(0);
+
+    // reset displacement
+    averageDisplacement = 0;
     
     driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE;
 
@@ -56,14 +61,14 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
   }
 
-  public double getAverageDisplacement() { // still needs to account for margin of error
+  public void updateAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
     double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
     double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
     
-    return (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
+    averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
   }
 
   public void driveWithJoystick() {
@@ -76,16 +81,27 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
 
+  public void resetEncoders() {
+    //reset encoders
+    this.encLeftMotor.setSelectedSensorPosition(0);
+    this.encRightMotor.setSelectedSensorPosition(0);
+
+    // reset displacement
+    averageDisplacement = 0;
+  }
+
   public boolean encoderDrive() {
     leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
     rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
    
-    if(getAverageDisplacement() < Constants.encoderConstants.TARGET_DISTANCEFT) {
+    if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
+      SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
-      SmartDashboard.putNumber("Average Displacement", getAverageDisplacement());
+      updateAverageDisplacement();
+      return true;
     }
 
-    return getAverageDisplacement() < Constants.encoderConstants.TARGET_DISTANCEFT; 
+    return false;
   }
 
   public void stop() {

@@ -27,16 +27,19 @@ public class Drive extends CommandBase {
     if(DriveTrain.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) { // 1
       // limelight code
     }
-    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE){ // 2
+    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2
       if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
         driveTrainSubsystem.encoderDrive();
       }
       else {
         DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+        driveTrainSubsystem.resetEncoders();
       }
     }
     else { // 0
-      DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // default drive mode is manual joystick (driveMode == 0)
+      SmartDashboard.putNumber("DriveTrain driveMode has been changed to: ", DriveTrain.driveMode);
+      driveTrainSubsystem.driveWithJoystick();
+      driveTrainSubsystem.resetEncoders();
     }
   }
 
