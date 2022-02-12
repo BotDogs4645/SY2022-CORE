@@ -1,16 +1,15 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.DriveTrain;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
+import frc.robot.Constants;
+import frc.robot.subsystems.DriveTrain;
 
 public class Drive extends CommandBase {
 
-  // DriveTrain subsystem to manipulate the DifferentialDrive
   private DriveTrain driveTrainSubsystem;
 
-  // initialize Drive command
+  private int driveMode;
+
   public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
     addRequirements(driveTrainSubsystem);
@@ -22,14 +21,24 @@ public class Drive extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
+
   public void execute() {
-    if (DriveTrain.driveMode == 0) {
-      driveTrainSubsystem.driveWithJoystick();
-    } else if (DriveTrain.driveMode == 1) {
+    if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) {
+      // limelight code 
       //driveTrainSubsystem.trackObject();
       //driveTrainSubsystem.getDistance();
     }
-    
+    else if(driveTrainSubsystem.driveMode == Constants.driveModeConstants.ENCODER_DRIVE){
+      if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
+        driveTrainSubsystem.encoderDrive();
+      }
+      else {
+        driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+      }
+    }
+    else {
+      driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // default drive mode is manual joystick (driveMode == 0)
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -44,3 +53,5 @@ public class Drive extends CommandBase {
     return false;
   }
 }
+    
+
