@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.robot.Constants;
 
@@ -19,17 +20,22 @@ public class ShooterPID extends PIDSubsystem {
   private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(-0.00028163, 0.00032042, 1.0505E-05);
 
   /** Creates a new Shooter2. */
-  public ShooterPID(WPI_TalonFX shooter, WPI_TalonFX loader) {
+  public ShooterPID(WPI_TalonFX shooter) {
     super(new PIDController(Constants.ShooterConstants.kP, Constants.ShooterConstants.kI, Constants.ShooterConstants.kD));
     shootie = shooter;
-    loadie = loader;
+    //loadie = loader;
     getController().setTolerance(Constants.ShooterConstants.shooterTolerance);
-    setSetpoint(Constants.ShooterConstants.shooterRPMSetpoint);
+    // RPM to voltage conversion rate (Max voltage over the max rotation ath that voltage)
+    setSetpoint(Constants.ShooterConstants.RPM_SETPOINT * ((double)12 / 6380));
+    SmartDashboard.putNumber("setpoint", Constants.ShooterConstants.RPM_SETPOINT * ((double)12 / 6380));
   }
 
   @Override
   public void useOutput(double output, double setpoint) {
     shootie.setVoltage(output + feedforward.calculate(setpoint));
+    SmartDashboard.putNumber("output", output);
+    SmartDashboard.putNumber("feedforward", feedforward.calculate(setpoint));
+    SmartDashboard.putNumber("shootie@rpm:", shootie.getSelectedSensorVelocity() / 2048 * 60);
   }
 
   @Override

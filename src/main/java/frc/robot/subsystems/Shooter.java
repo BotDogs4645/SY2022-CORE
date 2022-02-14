@@ -50,7 +50,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void testTrial() {
-    setLoaderDemandRPM(2000);
+    setLoaderDemandRPM(12);
   }
 
   public double getShooterCurrentRPM() {
