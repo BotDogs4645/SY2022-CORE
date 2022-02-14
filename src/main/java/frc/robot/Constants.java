@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot;
 
 /**
@@ -9,6 +13,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
     public static final class DriveConstants {
         // left motor ports
         public static final int upperLeftMotor = 10;
@@ -22,31 +27,29 @@ public final class Constants {
         public static final int driveController = 0;
 
         // max output
-        public static final double maxOutput = 0.75;
-
-        // drive modes
-        public static final int driveWithJoystick = 0;
-        public static final int driveWithLimelight = 1;
-        public static final int driveWithEncoder = 2; 
+        public static final double maxOutput = 0.5;
     }
 
-    public static final class ShooterConstants {
-        public static final int loaderMotor = 0;
-        public static final int shootMotor = 12;
-        //0.1, 0.00014, 0.12
-        public static final double kP = 0.00009;
-        public static final double kI = 0.06;
-        public static final double kD = 20.0;
+    public static final class IntegratedShooterPID {
+        public final static int ShooterID = 12;
+        public final static int ShooterID2 = 13;
 
-        public static final double shooterTolerance = 5/60;
-        public static final double RPM_SETPOINT = 3000;
+        public final static double kU = 0.35;
+        public final static double oscP = 4/5;
 
-        public static final double MAX_VOLT = 12;
+        public static final double kP = 0.21;
+        public static final double kI = 0.325; 
+        public static final double kD = 60;
+        public static final double kF = (1023 * .75) / 2260; // 22600
 
-        public static final double loaderPercentOut = .3;
+        public static final int slotId = 0;
+        public static final int PIDLoopId = 0;
 
-        // the max speed in RPM that the Falcon 500 can spin at
-        public static final int FALCON_MAX_RPM = 6380;
-        public static final int CONVERT_RPM = Constants.ShooterConstants.FALCON_MAX_RPM * 2048 / 600;
+        public static final int timeoutMS = 30;
+
+        public static final double RPMSetpoint = 100.0;
+        public static final double RPMSetpoint2 = 100.0;
+
+        public static final double ConversionRate = 2048.0 / 600.0;
     }
 }
