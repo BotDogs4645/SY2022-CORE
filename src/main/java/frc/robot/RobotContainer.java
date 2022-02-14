@@ -1,15 +1,22 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot;
+
+import java.lang.invoke.ConstantBootstraps;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.ShooterIntegratedPID;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,6 +25,14 @@ import frc.robot.subsystems.DriveTrain;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  // shooter stuff
+  public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.ShooterID);
+  public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.ShooterID2);
+  public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
+
+  public final JoystickButton joyEnable = new JoystickButton(driveController, 2);
+  public final JoystickButton joyDisable = new JoystickButton(driveController, 3);
+
   // tank drive motors
   private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
   private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
@@ -46,7 +61,7 @@ public class RobotContainer {
     rightMotors.setInverted(false);
     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
-  }   
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -54,8 +69,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-
   private void configureButtonBindings() {
+    joyEnable.whenPressed(new InstantCommand(shooter::enable, shooter));
+    joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.ENCODER_DRIVE)); // change drive mode to encoder
   }
 }

@@ -4,10 +4,16 @@ import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
 
 public class Drive extends CommandBase {
 
+  // DriveTrain subsystem to manipulate the DifferentialDrive
   private DriveTrain driveTrainSubsystem;
+
+  private NetworkTableEntry ledMode = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("ledMode");
 
   public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
@@ -20,12 +26,11 @@ public class Drive extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-
   public void execute() {
     SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
 
     if(DriveTrain.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) { // 1
-      // limelight code
+      ledMode.setNumber(1);
     }
     else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2
       if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
@@ -40,6 +45,7 @@ public class Drive extends CommandBase {
       SmartDashboard.putNumber("DriveTrain driveMode has been changed to: ", DriveTrain.driveMode);
       driveTrainSubsystem.driveWithJoystick();
       driveTrainSubsystem.resetEncoders();
+      ledMode.setNumber(0); // turn off limelight
     }
   }
 
@@ -55,5 +61,3 @@ public class Drive extends CommandBase {
     return false;
   }
 }
-    
-

@@ -6,9 +6,9 @@ import frc.robot.subsystems.DriveTrain;
 
 public class ChangeDriveMode extends CommandBase {
 
-  private DriveTrain driveTrainSubsystem;
-
   private int driveMode;
+
+  private DriveTrain driveTrainSubsystem
 
   public ChangeDriveMode(DriveTrain subsystem, int driveMode) {
     driveTrainSubsystem = subsystem;
