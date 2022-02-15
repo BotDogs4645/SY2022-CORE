@@ -28,15 +28,15 @@ public class Drive extends CommandBase {
   public void execute() {
     SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
 
-    if(DriveTrain.driveMode == Constants.DriveModeConstants.LIMELIGHT_DRIVE) { // 1
+    if(DriveTrain.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) { // 1
       ledMode.setNumber(1);
     }
-    else if(DriveTrain.driveMode == Constants.DriveModeConstants.ENCODER_DRIVE) { // 2
+    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2
       if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
         driveTrainSubsystem.encoderDrive();
       }
       else {
-        DriveTrain.driveMode = Constants.DriveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+        DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
         driveTrainSubsystem.resetEncoders();
       }
     }

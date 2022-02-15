@@ -36,7 +36,7 @@ public class DriveTrain extends SubsystemBase {
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight;
 
-  public final double rotMultiplier = -0.05; // CHANGE TO CONSTANT
+ // CHANGE TO CONSTANT
   public final double minRotSpeed = .15; // CHANGE TO CONSTANT
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
@@ -62,19 +62,19 @@ public class DriveTrain extends SubsystemBase {
 
     averageDisplacement = 0;
 
-    driveMode = Constants.DriveModeConstants.JOYSTICK_DRIVE;
+    driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE;
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
 
-    differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
+    differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
   }
 
   public void updateAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
-    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_PREVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
-    double rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_PREVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
+    double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
   }
@@ -96,10 +96,10 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public boolean encoderDrive() {
-    leftSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
-    rightSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
+    leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
+    rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
 
-    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
+    if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
       updateAverageDisplacement();
@@ -120,10 +120,10 @@ public class DriveTrain extends SubsystemBase {
       double finalRot = 0.0;
 
       if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-        finalRot = rotMultiplier * xOffset + minRotSpeed;
+        finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset + minRotSpeed;
       }
       else if (xOffset > .25) {   // dampens the rotation at the end while turning
-        finalRot = rotMultiplier * xOffset - minRotSpeed;
+        finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - minRotSpeed;
       }
       differentialDriveSub.tankDrive(finalRot, -finalRot);
     }

@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,8 +31,8 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // Calculate the tangent line velocity of the two shooters and update the RPMs for those values.
-    loaderRPM = loader.getSelectedSensorVelocity() * Constants.ShooterConstants.CONVERT_RPM;
-    shooterRPM = shooter.getSelectedSensorVelocity() * Constants.ShooterConstants.CONVERT_RPM;
+    loaderRPM = loader.getSelectedSensorVelocity() * Constants.IntegratedShooterPID.CONVERSION_RATE;
+    shooterRPM = shooter.getSelectedSensorVelocity() * Constants.IntegratedShooterPID.CONVERSION_RATE;
 
     SmartDashboard.putNumber("Shooter RPM", shooterRPM);
     SmartDashboard.putNumber("Loader RPM", loaderRPM);
