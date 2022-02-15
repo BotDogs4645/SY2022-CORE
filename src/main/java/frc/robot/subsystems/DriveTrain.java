@@ -1,35 +1,43 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Joystick;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
-import edu.wpi.first.networktables.NetworkTable;
 
 public class DriveTrain extends SubsystemBase {
 
   public static int driveMode;
-  private double averageDisplacement;
 
   private XboxController driveController;
-  private final DifferentialDrive differentialDriveSub;
 
-  public final double rotMultiplier = -0.05;
-  public final double minRotSpeed = .15;
+  private double averageDisplacement;
+
+  private final DifferentialDrive differentialDriveSub;
 
   public double leftSpeed;
   public double rightSpeed;
 
   private MotorControllerGroup leftMotors;
   private MotorControllerGroup rightMotors;
+
+  // encoder variables
+  private WPI_TalonFX encLeftMotor;
+  private WPI_TalonFX encRightMotor;
+
+  private double rawEncoderOutLeft;
+  private double rawEncoderOutRight;
+
+  public final double rotMultiplier = -0.05; // CHANGE TO CONSTANT
+  public final double minRotSpeed = .15; // CHANGE TO CONSTANT
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
 
@@ -38,9 +46,9 @@ public class DriveTrain extends SubsystemBase {
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry ty = table.getEntry("ty");
 
-  // initialize Drive subsystem
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController) {
     this.driveController = driveController;
+
     this.leftMotors = leftMotors;
     this.rightMotors= rightMotors;
 
@@ -50,26 +58,23 @@ public class DriveTrain extends SubsystemBase {
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
-    //reset encoders
-    this.encLeftMotor.setSelectedSensorPosition(0);
-    this.encRightMotor.setSelectedSensorPosition(0);
+    resetEncoders();
 
-    // reset displacement
     averageDisplacement = 0;
 
-    driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE;
+    driveMode = Constants.DriveModeConstants.JOYSTICK_DRIVE;
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
 
-    differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
+    differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
   }
 
   public void updateAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
-    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
-    double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
+    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_PREVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    double rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_PREVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
   }
@@ -85,19 +90,16 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void resetEncoders() {
-    //reset encoders
     this.encLeftMotor.setSelectedSensorPosition(0);
     this.encRightMotor.setSelectedSensorPosition(0);
-
-    // reset displacement
     averageDisplacement = 0;
   }
 
   public boolean encoderDrive() {
-    leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
-    rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
+    leftSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
+    rightSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
 
-    if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
+    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
       updateAverageDisplacement();
@@ -133,7 +135,6 @@ public class DriveTrain extends SubsystemBase {
       double radians = Math.toRadians(yOffset);
       double distance = ((h2-h1)/Math.tan(radians))/12;
       SmartDashboard.putNumber("Distance to Target", distance);
-
       return distance;
     }
 }
