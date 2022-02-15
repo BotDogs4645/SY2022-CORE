@@ -30,6 +30,7 @@ public class Drive extends CommandBase {
 
     if(DriveTrain.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) { // 1
       ledMode.setNumber(1);
+      driveTrainSubsystem.trackObject();
     }
     else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2
       if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
@@ -40,6 +41,7 @@ public class Drive extends CommandBase {
         driveTrainSubsystem.resetEncoders();
       }
     }
+
     else { // 0
       driveTrainSubsystem.driveWithJoystick();
       driveTrainSubsystem.resetEncoders();

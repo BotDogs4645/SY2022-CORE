@@ -67,7 +67,6 @@ public class ShooterIntegratedPID extends SubsystemBase {
       SmartDashboard.putNumber("shootie@avgErr:", avg_error / countee);
     }
   }
-//impasta
   public void enable() {
     enabled = true;
     countee = 0;

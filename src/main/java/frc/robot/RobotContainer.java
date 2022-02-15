@@ -31,8 +31,7 @@ public class RobotContainer {
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
 
-  public final JoystickButton joyEnable = new JoystickButton(driveController, 2);
-  public final JoystickButton joyDisable = new JoystickButton(driveController, 3);
+  public final JoystickButton limey = new JoystickButton(driveController, 2);
 
   // tank drive motors
   private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
@@ -71,8 +70,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    joyEnable.whenPressed(new InstantCommand(shooter::enable, shooter));
-    joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
-    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.ENCODER_DRIVE)); // change drive mode to encoder
+    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.ENCODER_DRIVE)); 
+    limey.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.driveModeConstants.LIMELIGHT_DRIVE));
   }
 }
