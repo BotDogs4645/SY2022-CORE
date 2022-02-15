@@ -36,9 +36,8 @@ public class DriveTrain extends SubsystemBase {
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight;
 
- // CHANGE TO CONSTANT
-  public final double minRotSpeed = .15; // CHANGE TO CONSTANT
-
+ 
+  
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
 
   NetworkTableEntry tx = table.getEntry("tx");
@@ -120,20 +119,20 @@ public class DriveTrain extends SubsystemBase {
       double finalRot = 0.0;
 
       if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-        finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset + minRotSpeed;
+        finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset + Constants.driveConstants.MIN_ROT_SPEED;
       }
       else if (xOffset > .25) {   // dampens the rotation at the end while turning
-        finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - minRotSpeed;
+        finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - Constants.driveConstants.MIN_ROT_SPEED;
       }
       differentialDriveSub.tankDrive(finalRot, -finalRot);
     }
 
     public double getDistance() {
-      double h1 = 3.25;
-      double h2 = 57.5;
       double yOffset = ty.getDouble(0.0);
       double radians = Math.toRadians(yOffset);
-      double distance = ((h2-h1)/Math.tan(radians))/12;
+      double distance;
+      
+      distance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
       SmartDashboard.putNumber("Distance to Target", distance);
       return distance;
     }

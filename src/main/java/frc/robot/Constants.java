@@ -36,6 +36,9 @@ public final class Constants {
 
         // max output
         public static final double MAX_OUTPUT = 0.5;
+        
+        // limelight tracking constants
+        public static final double MIN_ROT_SPEED = .15;
         public static final double ROT_MULTIPLIER = -0.05;
     }
     public static final class limelightConstants {
