@@ -12,7 +12,7 @@ public class Drive extends CommandBase {
 
   private DriveTrain driveTrainSubsystem;
 
-  private NetworkTableEntry ledMode = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("ledMode");
+  private NetworkTableEntry ledMode = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode");
 
   public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
@@ -28,18 +28,23 @@ public class Drive extends CommandBase {
   public void execute() {
     SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
 
-    if(DriveTrain.driveMode == Constants.driveModeConstants.LIMELIGHT_DRIVE) { // 1
-      ledMode.setNumber(1);
+    if(DriveTrain.driveMode == Constants.gamepadButtons.LIMELIGHT_DRIVE) { // 1
+      ledMode.setNumber(0);
+      DriveTrain.driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE;
     }
-    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2
+
+    else if(DriveTrain.driveMode == Constants.gamepadButtons.ENCODER_DRIVE) { // 2
       if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
         driveTrainSubsystem.encoderDrive();
+        ledMode.setNumber(0);
       }
       else {
-        DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+        DriveTrain.driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
         driveTrainSubsystem.resetEncoders();
+        ledMode.setNumber(0);
       }
     }
+
     else { // 0
       driveTrainSubsystem.driveWithJoystick();
       driveTrainSubsystem.resetEncoders();

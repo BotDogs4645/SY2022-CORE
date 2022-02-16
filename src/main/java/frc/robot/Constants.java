@@ -14,14 +14,11 @@ package frc.robot;
  */
 public final class Constants {
     public static final class gamepadButtons {
-        public static int ENCODER_BUTTON = 2;
-    }
-
-    public static final class driveModeConstants {
         public static int JOYSTICK_DRIVE = 0;
         public static int LIMELIGHT_DRIVE = 1;
         public static int ENCODER_DRIVE = 2;
     }
+
     public static final class driveConstants {
         // left motor ports
         public static final int UPPER_LEFT_MOTOR = 10;
@@ -35,12 +32,13 @@ public final class Constants {
         public static final int DRIVE_CONTROLLER = 0;
 
         // max output
-        public static final double MAX_OUTPUT = 0.5;
+        public static final double MAX_OUTPUT = 0.75;
         
         // limelight tracking constants
         public static final double MIN_ROT_SPEED = .15;
         public static final double ROT_MULTIPLIER = -0.05;
     }
+
     public static final class limelightConstants {
         public static final double LIMELIGHT_HEIGHT = 3.25; // distance from ground in inches
     }
@@ -71,6 +69,7 @@ public final class Constants {
 
         public static final double CONVERSION_RATE = 2048.0 / 600.0; // conversion to RPM
     }
+    
     public static final class encoderConstants {
         public static int k_UNITS_PREVOLUTION = 2048;
         public static double WHEEL_DIAMETERFT = 0.5; // 6 inches, unit of variable is feet
@@ -78,7 +77,7 @@ public final class Constants {
 
         public static double TARGET_DISTANCEFT = 8.46; // the distance from the field to the bottom of the vision tape
         
-        public static double LEFT_SPEED = 0.4;
-        public static double RIGHT_SPEED = 0.4;
+        public static double LEFT_SPEED = 0.6;
+        public static double RIGHT_SPEED = 0.6;
     }
 }

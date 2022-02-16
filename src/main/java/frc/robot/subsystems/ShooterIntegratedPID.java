@@ -45,14 +45,14 @@ public class ShooterIntegratedPID extends SubsystemBase {
     _talon2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
 
     _talon2.configNominalOutputForward(0, Constants.IntegratedShooterPID.timeoutMS);
-		_talon2.configNominalOutputReverse(0, Constants.IntegratedShooterPID.timeoutMS);
+	_talon2.configNominalOutputReverse(0, Constants.IntegratedShooterPID.timeoutMS);
     _talon2.configPeakOutputForward(1, Constants.IntegratedShooterPID.timeoutMS);
-		_talon2.configPeakOutputReverse(-1,  Constants.IntegratedShooterPID.timeoutMS);
+	_talon2.configPeakOutputReverse(-1,  Constants.IntegratedShooterPID.timeoutMS);
 
     _talon2.config_kF(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kF, Constants.IntegratedShooterPID.timeoutMS);
-		_talon2.config_kP(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kP, Constants.IntegratedShooterPID.timeoutMS);
-		_talon2.config_kI(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kI, Constants.IntegratedShooterPID.timeoutMS);
-		_talon2.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
+	_talon2.config_kP(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kP, Constants.IntegratedShooterPID.timeoutMS);
+	_talon2.config_kI(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kI, Constants.IntegratedShooterPID.timeoutMS);
+	_talon2.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
 
   }
 
@@ -81,6 +81,5 @@ public class ShooterIntegratedPID extends SubsystemBase {
     _talon.set(TalonFXControlMode.Disabled, 0);
     //_talon2.set(TalonFXControlMode.Disabled, 0);
   }
-
 
 }
