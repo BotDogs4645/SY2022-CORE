@@ -19,7 +19,7 @@ public class DriveTrain extends SubsystemBase {
 
   private XboxController driveController;
 
-  private double averageDisplacement;
+  public double averageDisplacement;
 
   private final DifferentialDrive differentialDriveSub;
 
@@ -75,7 +75,7 @@ public class DriveTrain extends SubsystemBase {
     double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
     double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
 
-    averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // returns average displacement
+    averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
   }
 
   public void driveWithJoystick() {
