@@ -32,22 +32,21 @@ public class Drive extends CommandBase {
       ledMode.setNumber(1);
       driveTrainSubsystem.trackObject();
     }
-    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2
-      if(driveTrainSubsystem.encoderDrive() == true) { // while encoders have not yet reached target distance and need to continue measuring...
-        driveTrainSubsystem.encoderDrive();
+    else if(DriveTrain.driveMode == Constants.driveModeConstants.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
+      driveTrainSubsystem.encoderDrive();
+      ledMode.setNumber(0);
+      if (driveTrainSubsystem.averageDisplacement >= Constants.encoderConstants.TARGET_DISTANCEFT)
+      {
+        ledMode.setNumber(1);
+        driveTrainSubsystem.trackObject();
       }
-      else {
-        DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
-        driveTrainSubsystem.resetEncoders();
-      }
-    }
-
-    else { // 0
-      driveTrainSubsystem.driveWithJoystick();
+  }
+    else { 
+      DriveTrain.driveMode = Constants.driveModeConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       driveTrainSubsystem.resetEncoders();
-      ledMode.setNumber(0); // turn off limelight
     }
   }
+  
 
   // Called once the command ends or is interrupted.
   @Override
