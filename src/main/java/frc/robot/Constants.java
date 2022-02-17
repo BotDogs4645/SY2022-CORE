@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 /**
@@ -13,13 +9,13 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final class gamepadButtons {
+    public static final class GamepadButtons {
         public static int JOYSTICK_DRIVE = 0;
         public static int LIMELIGHT_DRIVE = 1;
         public static int ENCODER_DRIVE = 2;
     }
 
-    public static final class driveConstants {
+    public static final class DriveConstants {
         // left motor ports
         public static final int UPPER_LEFT_MOTOR = 10;
         public static final int LOWER_LEFT_MOTOR = 7;
@@ -39,11 +35,11 @@ public final class Constants {
         public static final double ROT_MULTIPLIER = -0.05;
     }
 
-    public static final class limelightConstants {
+    public static final class LimelightConstants {
         public static final double LIMELIGHT_HEIGHT = 3.25; // distance from ground in inches
     }
 
-    public static final class gameConstants {
+    public static final class GameConstants {
         public static final double GOAL_HEIGHT = 57.5; //in inches
     } 
 
@@ -70,14 +66,21 @@ public final class Constants {
         public static final double CONVERSION_RATE = 2048.0 / 600.0; // conversion to RPM
     }
     
-    public static final class encoderConstants {
-        public static int k_UNITS_PREVOLUTION = 2048;
-        public static double WHEEL_DIAMETERFT = 0.5; // 6 inches, unit of variable is feet
-        public static double REVOLUTION_PFT = 1 / WHEEL_DIAMETERFT * Math.PI;
+    public static final class EncoderConstants {
+        public static int k_UNITS_P_REVOLUTION = 2048;
+        public static double WHEEL_DIAMETER_FT = 0.5; // 6 inches, unit of variable is feet
+        public static double REVOLUTION_P_FT = 1 / WHEEL_DIAMETER_FT * Math.PI;
 
-        public static double TARGET_DISTANCEFT = 8.46; // the distance from the field to the bottom of the vision tape
+        public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape
         
         public static double LEFT_SPEED = 0.6;
         public static double RIGHT_SPEED = 0.6;
+
+        // PID STUFF
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+
+        public static final int ENCODER_TOLERANCE = k_UNITS_P_REVOLUTION / 8; // error is within 1/8 of a revolution
     }
 }

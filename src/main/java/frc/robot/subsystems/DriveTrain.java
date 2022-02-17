@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -13,19 +14,21 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.EncoderConstants;
 
 public class DriveTrain extends SubsystemBase {
 
   public static int driveMode;
-
-  private XboxController driveController;
-
   public double averageDisplacement;
 
+  private XboxController driveController;
   private final DifferentialDrive differentialDriveSub;
 
-  public double leftSpeed;
-  public double rightSpeed;
+  private double leftSpeed;
+  private double rightSpeed;
+
+  private double leftDistanceTraveled;
+  private double rightDistanceTraveled;
 
   private MotorControllerGroup leftMotors;
   private MotorControllerGroup rightMotors;
@@ -36,6 +39,11 @@ public class DriveTrain extends SubsystemBase {
 
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight;
+
+  private double error;
+  private double turn_power;
+
+  private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
   
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
 
@@ -46,33 +54,33 @@ public class DriveTrain extends SubsystemBase {
 
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
+    driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
 
+    // encoder stuff
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
 
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-
     resetEncoders();
 
-    averageDisplacement = 0;
-
-    driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE;
-
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
+    differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
-    differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
+    // drivetrain PID stuff
+    drivePID.setTolerance(Constants.EncoderConstants.ENCODER_TOLERANCE);
+    drivePID.setSetpoint(0);
   }
 
   public void updateAverageDisplacement() { // still needs to account for margin of error
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
-    double leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
-    double rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_PREVOLUTION * Constants.encoderConstants.REVOLUTION_PFT);
+    leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
   }
@@ -93,15 +101,19 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = 0;
   }
 
-  public boolean encoderDrive() {
-    leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
-    rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
+  public boolean encoderDrive(int power) {
+    leftSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
+    rightSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
 
     SmartDashboard.putNumber("leftiespeed", leftSpeed);
     SmartDashboard.putNumber("rightiespeed", rightSpeed);
-    if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
+
+    error = leftDistanceTraveled - rightDistanceTraveled;
+    turn_power = Constants.EncoderConstants.kP * error;
+
+    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+      differentialDriveSub.tankDrive(power, turn_power, false);
       updateAverageDisplacement();
       return true;
     }
@@ -120,10 +132,10 @@ public class DriveTrain extends SubsystemBase {
     double finalRot = 0.0;
 
     if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-      finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset + Constants.driveConstants.MIN_ROT_SPEED;
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
     }
     else if (xOffset > .25) {   // dampens the rotation at the end while turning
-      finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - Constants.driveConstants.MIN_ROT_SPEED;
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
     differentialDriveSub.tankDrive(finalRot, -finalRot);
   }
@@ -133,7 +145,7 @@ public class DriveTrain extends SubsystemBase {
     double radians = Math.toRadians(yOffset);
     double distance;
     
-    distance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
+    distance = ((Constants.LimelightConstants.LIMELIGHT_HEIGHT - Constants.GameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
     SmartDashboard.putNumber("Distance to Target", distance);
     return distance;
   }
