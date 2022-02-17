@@ -23,7 +23,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie) {
     this._talon = shootie;
     _talon.configFactoryDefault();
-    _talon.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+    _talon.set(TalonFXControlMode.Velocity, 0);
     _talon.configNeutralDeadband(.05); // 25
     _talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
 
@@ -40,7 +40,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
     //Loadie PID
     _talon2 = loadie;
     _talon2.configFactoryDefault();
-    _talon2.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT);
+    _talon2.set(TalonFXControlMode.Velocity, 0);
     _talon2.configNeutralDeadband(.05); // 25
     _talon2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
 
@@ -72,7 +72,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
     countee = 0;
     avg_error = 0;
     _talon.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE);
-   // _talon2.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.RPMSetpoint2 * Constants.IntegratedShooterPID.ConversionRate);
+    //_talon2.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE);
   }
 
   public void disable() {
