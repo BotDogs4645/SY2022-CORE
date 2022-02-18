@@ -50,13 +50,10 @@ public final class Constants {
     public static final class IntegratedShooterPID {
         public final static int SHOOTIE_ID = 13;
         public final static int LOADIE_ID = 12;
-
-        public final static double kU = 0.4;
-        public final static double OSCILLATION_P = 4/5;
-
-        public static final double kP = .15; // .15 - .1 too low <3 //kU * 0.6;
-        public static final double kI = .0055; //(1.2* kU) / OSCILLATION_P; 
-        public static final double kD = 50; //(3 * kU * OSCILLATION_P) / 40;
+        
+        public static final double kP = .005; // .15 - .1 too low <3 //kU * 0.6;
+        public static final double kI = .00125; //(1.2* kU) / OSCILLATION_P; 
+        public static final double kD = 50; //(3 * kU * OSCILLATION_P) / 40; // all of this is complete shit and shouldn't be used (the tuning method)
         public static final double kF = 0; //(1023 * .75) / 2260; // 22600
 
         public static final int SLOT_ID = 0;
@@ -64,8 +61,8 @@ public final class Constants {
 
         public static final int timeoutMS = 30;
 
-        public static final double SHOOTIE_RPM_SETPOINT = 2000.0;
-        public static final double LOADIE_RPM_SETPOINT = 0.0;
+        public static final double SHOOTIE_RPM_SETPOINT = -6380.0;
+        public static final double LOADIE_RPM_SETPOINT = 6380.0;
 
         public static final double CONVERSION_RATE = 2048.0 / 600.0; // conversion to RPM
     }
