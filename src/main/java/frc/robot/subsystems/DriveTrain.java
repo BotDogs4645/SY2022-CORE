@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.EncoderConstants;
 
 public class DriveTrain extends SubsystemBase {
 
@@ -33,15 +33,17 @@ public class DriveTrain extends SubsystemBase {
   private MotorControllerGroup leftMotors;
   private MotorControllerGroup rightMotors;
 
-  // encoder variables
   private WPI_TalonFX encLeftMotor;
   private WPI_TalonFX encRightMotor;
 
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight;
 
-  private double error;
-  private double turn_power;
+  private double error = 0;
+  private double heading = 0; 
+  private double turnPower = 0;
+
+  private final AHRS ahrs = new AHRS();
 
   private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
   
@@ -59,20 +61,20 @@ public class DriveTrain extends SubsystemBase {
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
 
-    // encoder stuff
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
 
+    resetEncoders();
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    resetEncoders();
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
-    // drivetrain PID stuff
+    ahrs.reset(); 
+    heading = Constants.EncoderConstants.FLYWHEEL_RPM * ahrs.getAngle(); // incorporates flywheel feedforward
     drivePID.setTolerance(Constants.EncoderConstants.ENCODER_TOLERANCE);
-    drivePID.setSetpoint(0);
+    drivePID.setSetpoint(heading); // sets setpoint to initial heading
   }
 
   public void updateAverageDisplacement() { // still needs to account for margin of error
@@ -101,19 +103,22 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = 0;
   }
 
-  public boolean encoderDrive(int power) {
+  public void getCorrection() {
+    error = heading - ahrs.getAngle();
+    turnPower = error * Constants.EncoderConstants.kP;
+  }
+
+  public boolean encoderDrive() {
     leftSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
     rightSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
 
     SmartDashboard.putNumber("leftiespeed", leftSpeed);
     SmartDashboard.putNumber("rightiespeed", rightSpeed);
 
-    error = leftDistanceTraveled - rightDistanceTraveled;
-    turn_power = Constants.EncoderConstants.kP * error;
-
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-      differentialDriveSub.tankDrive(power, turn_power, false);
+      getCorrection(); // updates turnPower
+      differentialDriveSub.tankDrive(leftSpeed * turnPower, rightSpeed * turnPower);
       updateAverageDisplacement();
       return true;
     }
