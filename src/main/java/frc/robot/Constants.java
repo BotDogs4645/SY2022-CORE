@@ -76,5 +76,17 @@ public final class Constants {
         
         public static double LEFT_SPEED = 0.6;
         public static double RIGHT_SPEED = 0.6;
+        public static double kP = 0;
+        public static double kI = 0;
+        public static double kD = 0;
+
+        public static int k_UNITS_P_REVOLUTION = 2048; //# of raw encoder units per revolution
+        public static double FLYWHEEL_RPM = 0;      //    <-
+        public static double ENCODER_TOLERANCE = 0; // SHARON!! these constants weren't on github, if you could take a look that would be awesome 
+        public static double REVOLUTION_P_FT = 0;   //    <-
+    }
+    public static final class climberConstants {
+        public static int RIGHT_CLIMBER_ID = 4;
+        public static int LEFT_CLIMBER_ID = 5;
     }
 }
