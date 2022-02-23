@@ -17,6 +17,7 @@ public final class Constants {
         public static int JOYSTICK_DRIVE = 0;
         public static int LIMELIGHT_DRIVE = 1;
         public static int ENCODER_DRIVE = 2;
+        public static int CLIMBER_BUTTON = 3;
     }
 
     public static final class driveConstants {
