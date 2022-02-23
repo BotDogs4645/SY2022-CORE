@@ -25,7 +25,7 @@ public final class Constants {
         public static final int UPPER_LEFT_MOTOR = 10;
         public static final int LOWER_LEFT_MOTOR = 7;
 
-        // right motor ports
+        // right motor port
         public static final int UPPER_RIGHT_MOTOR = 9;
         public static final int LOWER_RIGHT_MOTOR = 8;
 
@@ -52,18 +52,18 @@ public final class Constants {
         public final static int SHOOTIE_ID = 13;
         public final static int LOADIE_ID = 12;
         
-        public static final double kP = .005; // .15 - .1 too low <3 //kU * 0.6;
-        public static final double kI = .00125; //(1.2* kU) / OSCILLATION_P; 
-        public static final double kD = 50; //(3 * kU * OSCILLATION_P) / 40; // all of this is complete shit and shouldn't be used (the tuning method)
-        public static final double kF = 0; //(1023 * .75) / 2260; // 22600
+        public static final double kP = .0045; // .005 - .1 too low <3 //kU * 0.6;
+        public static final double kI = .000085; // .00125
+        public static final double kD = 30; //
+        public static final double kF = .125; //(1023 * .75) / 2260; // 22600
 
         public static final int SLOT_ID = 0;
         public static final int PID_LOOP_ID = 0;
 
         public static final int timeoutMS = 30;
 
-        public static final double SHOOTIE_RPM_SETPOINT = -6380.0;
-        public static final double LOADIE_RPM_SETPOINT = 6380.0;
+        public static final double SHOOTIE_RPM_SETPOINT = -4000.0;
+        public static final double LOADIE_RPM_SETPOINT = 4000.0;
 
         public static final double CONVERSION_RATE = 2048.0 / 600.0; // conversion to RPM
     }
