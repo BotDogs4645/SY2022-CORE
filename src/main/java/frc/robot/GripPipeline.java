@@ -16,6 +16,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.*;
 import org.opencv.objdetect.*;
 
+import edu.wpi.first.vision.VisionPipeline;
+
 /**
 * GripPipeline class.
 *
@@ -23,7 +25,7 @@ import org.opencv.objdetect.*;
 *
 * @author GRIP
 */
-public class GripPipeline {
+public class GripPipeline implements VisionPipeline {
 
 	//Outputs
 	private Mat hsvThresholdOutput = new Mat();
@@ -100,6 +102,7 @@ public class GripPipeline {
 		Core.inRange(out, new Scalar(hue[0], sat[0], val[0]),
 			new Scalar(hue[1], sat[1], val[1]), out);
 	}
+
 
 	/**
 	 * An indication of which type of filter to use for a blur.

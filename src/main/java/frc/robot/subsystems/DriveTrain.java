@@ -8,6 +8,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.vision.VisionPipeline;
+import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -15,6 +17,12 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.GripPipeline;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
+import java.nio.channels.Pipe;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.vision.VisionPipeline;
 
 public class DriveTrain extends SubsystemBase {
 
@@ -42,6 +50,11 @@ public class DriveTrain extends SubsystemBase {
   private double error = 0;
   private double heading = 0; 
   private double turnPower = 0;
+
+  private VisionThread VisionThread;
+
+  private GripPipeline pipe;
+  private Object foundTarget = new Object();
 
   private final AHRS ahrs = new AHRS();
 
@@ -154,5 +167,31 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Target", distance);
     return distance;
   }
+  // grip declarations
+  public void declareGrip() {
+    UsbCamera cam = new UsbCamera("GRIP Cam","/dev/video0");
+  cam.setResolution(480, 720);
+  VisionThread = new VisionThread(cam, new GripPipeline(), pipeline -> {
+    synchronized(foundTarget) {
+      pipe = pipeline;
+    }
+  });
+}
   
+
+  public void orientWithGrip() {
+    synchronized (foundTarget) {
+      Rect r = Imgproc.boundingRect(pipe.findBlobsOutput());
+      double finalRot = 0.0;
+      double centerX = r.x;
+
+      if (centerX < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
+        finalRot = Constants.driveConstants.ROT_MULTIPLIER * centerX + Constants.driveConstants.MIN_ROT_SPEED;
+      }
+      else if (centerX > .25) {   // dampens the rotation at the end while turning
+        finalRot = Constants.driveConstants.ROT_MULTIPLIER * centerX - Constants.driveConstants.MIN_ROT_SPEED;
+      }
+      differentialDriveSub.tankDrive(finalRot, -finalRot);
+    }
+  }
 }

@@ -14,10 +14,12 @@ package frc.robot;
  */
 public final class Constants {
     public static final class gamepadButtons {
-        public static int JOYSTICK_DRIVE = 0;
+		public static int JOYSTICK_DRIVE = 0;
         public static int LIMELIGHT_DRIVE = 1;
         public static int ENCODER_DRIVE = 2;
         public static int CLIMBER_BUTTON = 3;
+        public static int PID_BUTTON = 4;
+        public static int GRIP_BUTTON = 5;
     }
 
     public static final class driveConstants {

@@ -42,8 +42,8 @@ public class RobotContainer {
   public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
   public final JoystickButton limelightButton = new JoystickButton(driveController, Constants.gamepadButtons.LIMELIGHT_DRIVE);
   public final JoystickButton climbButton = new JoystickButton(driveController, Constants.gamepadButtons.CLIMBER_BUTTON);
-  public final JoystickButton pidButton = new JoystickButton(driveController, 2);
-  public final JoystickButton joyDisable = new JoystickButton(driveController, 3);
+  public final JoystickButton pidButton = new JoystickButton(driveController, Constants.gamepadButtons.PID_BUTTON);
+  public final JoystickButton gripButton = new JoystickButton(driveController, Constants.gamepadButtons.GRIP_BUTTON);
   // fix these button constants, they overlap -
    // shooter  --> COMMENTED OUT BC MOTORS ARE MISSING FROM CHASSIS
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
