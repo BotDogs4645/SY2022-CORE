@@ -1,4 +1,4 @@
-package grip;
+package frc.robot;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -176,8 +176,7 @@ public class GripPipeline {
 	 */
 	private void findBlobs(Mat input, double minArea, double[] circularity,
 		Boolean darkBlobs, MatOfKeyPoint blobList) {
-		MSER.
-		FeatureDetector blobDet = FeatureDetector.create(FeatureDetector.SIMPLEBLOB);
+		MSER detector = MSER.create();
 		try {
 			File tempFile = File.createTempFile("config", ".xml");
 
@@ -219,12 +218,11 @@ public class GripPipeline {
 			writer = new FileWriter(tempFile, false);
 			writer.write(config.toString());
 			writer.close();
-			blobDet.read(tempFile.getPath());
+			detector.read(tempFile.getPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		blobDet.detect(input, blobList);
+		detector.detect(input, blobList);
 	}
 
 
