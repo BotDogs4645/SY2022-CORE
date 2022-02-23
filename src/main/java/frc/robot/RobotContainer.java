@@ -77,8 +77,8 @@ public class RobotContainer {
     // joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
 
     climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
-    //encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
-    //limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
+    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
+    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
     
   }
 }
