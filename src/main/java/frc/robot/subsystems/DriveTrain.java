@@ -37,18 +37,17 @@ public class DriveTrain extends SubsystemBase {
   private WPI_TalonFX encRightMotor;
 
   private double rawEncoderOutLeft;
-  private double rawEncoderOutRight;
+  private double rawEncoderOutRight; 
 
   private double error = 0;
-  private double heading = 0; 
-  private double turnPower = 0;
+  private double turn = 0;
+  private double idealHeading;
 
   private final AHRS ahrs = new AHRS();
-
+  
   private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
   
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
-
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry tv = table.getEntry("tv");
   NetworkTableEntry ta = table.getEntry("ta");
@@ -72,12 +71,12 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
     ahrs.reset(); 
-    heading = Constants.EncoderConstants.FLYWHEEL_RPM * ahrs.getAngle(); // incorporates flywheel feedforward
-    drivePID.setTolerance(Constants.EncoderConstants.ENCODER_TOLERANCE);
-    drivePID.setSetpoint(heading); // sets setpoint to initial heading
+    idealHeading = ahrs.getAngle(); // sets starting position as "0"
+    drivePID.setTolerance(Constants.EncoderConstants.ANGLE_TOLERANCE);
+    drivePID.setSetpoint(idealHeading); // sets setpoint to initial heading
   }
 
-  public void updateAverageDisplacement() { // still needs to account for margin of error
+  public void updateAverageDisplacement() {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
@@ -90,10 +89,7 @@ public class DriveTrain extends SubsystemBase {
   public void driveWithJoystick() {
     leftSpeed = driveController.getLeftY();
     rightSpeed = driveController.getRightY();
-
-    SmartDashboard.putNumber("Left Speed", leftMotors.get());
-    SmartDashboard.putNumber("Right Speed", rightMotors.get());
-
+    
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
 
@@ -104,8 +100,13 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void getCorrection() {
-    error = heading - ahrs.getAngle();
-    turnPower = error * Constants.EncoderConstants.kP;
+    SmartDashboard.putNumber("Start Heading", idealHeading);
+    SmartDashboard.putNumber("Actual Heading", ahrs.getAngle());
+    error = ahrs.getAngle() - idealHeading; // measured - true
+    turn = error * Constants.EncoderConstants.kP;
+
+    SmartDashboard.putNumber("Error", error);
+    SmartDashboard.putNumber("Adjusted Right Side Speed", rightSpeed + turn); // right side is underturning, so only adjust R motors
   }
 
   public boolean encoderDrive() {
@@ -117,8 +118,8 @@ public class DriveTrain extends SubsystemBase {
 
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-      getCorrection(); // updates turnPower
-      differentialDriveSub.tankDrive(leftSpeed * turnPower, rightSpeed * turnPower);
+      getCorrection(); // updates turn
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed + turn);
       updateAverageDisplacement();
       return true;
     }

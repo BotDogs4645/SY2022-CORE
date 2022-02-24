@@ -76,11 +76,11 @@ public final class Constants {
         public static double LEFT_SPEED = 0.6;
         public static double RIGHT_SPEED = 0.6; 
 
-        public static final double kP = 0.005;
+        public static final double kP = 0.05; // TUNE!
         public static final double kI = 0; // NOT USED
         public static final double kD = 0; // NOT USED
 
-        public static final int ENCODER_TOLERANCE = k_UNITS_P_REVOLUTION / 8; // error is within 1/8 of a revolution
+        public static final int ANGLE_TOLERANCE = 2; // 2 degrees as acceptable error
 
         public static final int FLYWHEEL_RPM = 12 / 6380; 
     }

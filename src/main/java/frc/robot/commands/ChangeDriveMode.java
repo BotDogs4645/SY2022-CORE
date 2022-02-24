@@ -26,7 +26,6 @@ public class ChangeDriveMode extends CommandBase {
   public void execute() {
     DriveTrain.driveMode = driveMode; // change driveMode varibale in subsystem
     CommandScheduler.getInstance().cancel(this);
-    
   }
 
   // Called once the command ends or is interrupted.
