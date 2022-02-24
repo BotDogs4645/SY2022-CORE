@@ -16,6 +16,7 @@ import frc.robot.Constants;
 public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX _talon;
   private WPI_TalonFX _talon2;
+  private boolean onOffFlag;
 
   private boolean enabled = false;
   private double avg_error = 0;
@@ -76,12 +77,17 @@ public class ShooterIntegratedPID extends SubsystemBase {
     avg_error = 0;
     _talon.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE);
     _talon2.set(TalonFXControlMode.Velocity, Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE);
+    onOffFlag = true;
   }
 
   public void disable() {
     enabled = false;
     _talon.set(TalonFXControlMode.Disabled, 0);
     _talon2.set(TalonFXControlMode.Disabled, 0);
+    onOffFlag = false;
+  }
+  public boolean getOnOffFlag() {
+    return onOffFlag;
   }
 
 }

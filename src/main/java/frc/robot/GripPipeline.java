@@ -25,7 +25,7 @@ import edu.wpi.first.vision.VisionPipeline;
 *
 * @author GRIP
 */
-public class GripPipeline implements VisionPipeline {
+public class GripPipeline implements VisionPipeline { //gorillaGRIP
 
 	//Outputs
 	private Mat hsvThresholdOutput = new Mat();

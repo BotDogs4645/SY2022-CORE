@@ -73,9 +73,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // joyEnable.whenPressed(new InstantCommand(shooter::enable, shooter));
-    // joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
-
+    pidButton.whenPressed(new ConditionalCommand(new InstantCommand(shooter::enable), new InstantCommand(shooter::disable), shooter::getOnOffFlag));
     climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
     limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
