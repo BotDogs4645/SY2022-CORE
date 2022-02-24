@@ -130,8 +130,8 @@ public class DriveTrain extends SubsystemBase {
 
     if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-      getCorrection(); // updates turnPower
-      differentialDriveSub.tankDrive(leftSpeed * turnPower, rightSpeed * turnPower);
+     // getCorrection(); // updates turn
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);  //rightSpeed + turn);
       updateAverageDisplacement();
       return true;
     }
