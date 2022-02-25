@@ -86,7 +86,11 @@ public final class Constants {
         public static double REVOLUTION_P_FT = 0;   //    <-
     }
     public static final class climberConstants {
-        public static int RIGHT_CLIMBER_ID = 4;
+        public static int RIGHT_CLIMBER_ID = 4; //PLACEHOLDERS
         public static int LEFT_CLIMBER_ID = 5;
+    }
+    public static final class indexerConstants {
+        public static int VERTICAL_INDEXER_MOTOR  = 6; //PLACEHOLDERS
+        public static int HORIZONTAL_INDEXER_MOTOR = 7;
     }
 }

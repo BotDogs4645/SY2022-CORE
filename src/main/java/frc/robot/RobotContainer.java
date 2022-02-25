@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.ShooterIntegratedPID;
 
 public class RobotContainer {
@@ -28,10 +29,16 @@ public class RobotContainer {
 
   private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
   private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
- // climber motors
+ 
+  // climber motors
   private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
   private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
- // tank drive motor groups
+
+  // indexer motors
+  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.VERTICAL_INDEXER_MOTOR);
+  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.HORIZONTAL_INDEXER_MOTOR);
+  
+  // tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
@@ -50,9 +57,9 @@ public class RobotContainer {
   // subsystems
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
-
+  public final Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem);
+  public final Drive driveCommand = new Drive(driveSubsystem, indexerSubsystem);
   public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
