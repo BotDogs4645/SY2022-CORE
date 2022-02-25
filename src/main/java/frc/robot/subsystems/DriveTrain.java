@@ -71,8 +71,8 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
     ahrs.reset(); 
-    idealHeading = ahrs.getAngle(); // sets starting position as "0"
-    drivePID.setTolerance(Constants.EncoderConstants.ANGLE_TOLERANCE);
+    idealHeading = ahrs.getYaw(); // sets starting position as "0"
+    drivePID.setTolerance(0);
     drivePID.setSetpoint(idealHeading); // sets setpoint to initial heading
   }
 
@@ -101,24 +101,23 @@ public class DriveTrain extends SubsystemBase {
 
   public void getCorrection() {
     SmartDashboard.putNumber("Start Heading", idealHeading);
-    SmartDashboard.putNumber("Actual Heading", ahrs.getAngle());
-    error = ahrs.getAngle() - idealHeading; // measured - true
-    turn = error * Constants.EncoderConstants.kP;
+    SmartDashboard.putNumber("Actual Heading", ahrs.getYaw());
+    error = idealHeading - ahrs.getYaw(); 
+    turn = error * Constants.EncoderConstants.kP * -1;
 
     SmartDashboard.putNumber("Error", error);
-    SmartDashboard.putNumber("Adjusted Right Side Speed", rightSpeed + turn); // right side is underturning, so only adjust R motors
+    SmartDashboard.putNumber("Adjusted Right Side Speed", leftSpeed + turn); // right side is underturning, so only adjust R motors
   }
 
   public boolean encoderDrive() {
     leftSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
     rightSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
 
-    SmartDashboard.putNumber("leftiespeed", leftSpeed);
-    SmartDashboard.putNumber("rightiespeed", rightSpeed);
-
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       getCorrection(); // updates turn
+      SmartDashboard.putNumber("left speed", leftSpeed);
+      SmartDashboard.putNumber("right speed", rightSpeed);
       differentialDriveSub.tankDrive(leftSpeed, rightSpeed + turn);
       updateAverageDisplacement();
       return true;

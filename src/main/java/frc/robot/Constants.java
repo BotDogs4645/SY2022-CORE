@@ -73,10 +73,10 @@ public final class Constants {
 
         public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape
         
-        public static double LEFT_SPEED = 0.6;
-        public static double RIGHT_SPEED = 0.6; 
+        public static double LEFT_SPEED = 0.55;
+        public static double RIGHT_SPEED = 0.55; 
 
-        public static final double kP = 0.05; // TUNE!
+        public static final double kP = 0.0097; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX
         public static final double kI = 0; // NOT USED
         public static final double kD = 0; // NOT USED
 
