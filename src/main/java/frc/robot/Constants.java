@@ -14,12 +14,12 @@ package frc.robot;
  */
 public final class Constants {
     public static final class gamepadButtons {
-		public static int JOYSTICK_DRIVE = 0;
-        public static int LIMELIGHT_DRIVE = 1;
-        public static int ENCODER_DRIVE = 2;
-        public static int CLIMBER_BUTTON = 3;
-        public static int PID_BUTTON = 4;
-        public static int GRIP_BUTTON = 5;
+		public static int JOYSTICK_DRIVE = 6;
+        public static int LIMELIGHT_DRIVE = 2;
+        public static int ENCODER_DRIVE = 3;
+        public static int CLIMBER_BUTTON = 4;
+        public static int PID_BUTTON = 1;
+        public static int GRIP_BUTTON = 6;
     }
 
     public static final class driveConstants {
@@ -54,10 +54,10 @@ public final class Constants {
         public final static int SHOOTIE_ID = 13;
         public final static int LOADIE_ID = 12;
         
-        public static final double kP = .0045; // .005 - .1 too low <3 //kU * 0.6;
-        public static final double kI = .000085; // .00125
-        public static final double kD = 30; //
-        public static final double kF = .125; //(1023 * .75) / 2260; // 22600
+        public static final double kP = .005; // .005 - .1 too low <3 //kU * 0.6;
+        public static final double kI = 0.00125; // .00125
+        public static final double kD = 50; //
+        public static final double kF = (1023*0.75); //(1023 * .75) / 2260; // 22600
 
         public static final int SLOT_ID = 0;
         public static final int PID_LOOP_ID = 0;

@@ -33,7 +33,7 @@ public class RobotContainer {
  // climber motors
   public final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
   public final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
- // tank drive motor groups
+// tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
@@ -41,8 +41,8 @@ public class RobotContainer {
   // buttons
   public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
   public final JoystickButton limelightButton = new JoystickButton(driveController, Constants.gamepadButtons.LIMELIGHT_DRIVE);
-  public final JoystickButton climbButton = new JoystickButton(driveController, Constants.gamepadButtons.CLIMBER_BUTTON);
-  public final JoystickButton pidButton = new JoystickButton(driveController, Constants.gamepadButtons.PID_BUTTON);
+  public final JoystickButton joyDisable = new JoystickButton(driveController, Constants.gamepadButtons.CLIMBER_BUTTON);
+  public final JoystickButton joyEnable = new JoystickButton(driveController, Constants.gamepadButtons.PID_BUTTON);
   public final JoystickButton gripButton = new JoystickButton(driveController, Constants.gamepadButtons.GRIP_BUTTON);
   // fix these button constants, they overlap -
    // shooter  --> COMMENTED OUT BC MOTORS ARE MISSING FROM CHASSIS
@@ -55,14 +55,14 @@ public class RobotContainer {
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, driveController);
 
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem);
-  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
+   public final Drive driveCommand = new Drive(driveSubsystem);
+   public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    leftMotors.setInverted(true);
-    rightMotors.setInverted(false);
-    driveSubsystem.setDefaultCommand(driveCommand);
+     leftMotors.setInverted(true);
+     rightMotors.setInverted(false);
+     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
@@ -73,10 +73,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    pidButton.whenPressed(new ConditionalCommand(new InstantCommand(shooter::enable), new InstantCommand(shooter::disable), shooter::getOnOffFlag));
-    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
-    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
-    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
+    joyEnable.whenPressed(new InstantCommand(shooter::enable, shooter));
+    joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
+    //pidButton.whenPressed(new ConditionalCommand(new InstantCommand(shooter::enable), new InstantCommand(shooter::disable), shooter::getOnOffFlag));
+    //climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
+    //encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
+    //limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
     
   }
 }
