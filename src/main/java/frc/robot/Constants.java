@@ -77,7 +77,7 @@ public final class Constants {
         public static double LEFT_SPEED = 0.55;
         public static double RIGHT_SPEED = 0.55; 
 
-        public static final double kP = 0.0078; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX
+        public static final double kP = 0.0078; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
         public static final double kI = 1; // NOT USED
         public static final double kD = 0; // NOT USED
     }
