@@ -40,6 +40,9 @@ public class DriveTrain extends SubsystemBase {
   private double rawEncoderOutRight; 
 
   private double error = 0;
+  private double prev_error = 0;
+  private double integral = 1;
+  private double derivative = 1;
   private double turn = 0;
   private double idealHeading;
 
@@ -70,7 +73,7 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
-    ahrs.reset(); 
+    //ahrs.reset(); 
     idealHeading = ahrs.getYaw(); // sets starting position as "0"
     drivePID.setTolerance(0);
     drivePID.setSetpoint(idealHeading); // sets setpoint to initial heading
@@ -102,18 +105,24 @@ public class DriveTrain extends SubsystemBase {
   public void getCorrection() {
     SmartDashboard.putNumber("Start Heading", idealHeading);
     SmartDashboard.putNumber("Actual Heading", ahrs.getYaw());
-    error = idealHeading - ahrs.getYaw(); 
-    turn = error * Constants.EncoderConstants.kP * -1;
+    error = (idealHeading - ahrs.getYaw()); 
+    prev_error = error;
+    integral += error * .02; // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
+    derivative = (error - prev_error) / .02;
+    turn = ((error * Constants.EncoderConstants.kP) + (integral * 0.0001) + derivative);
+    //turn = ((error * Constants.EncoderConstants.kP) + derivative); 1.26
 
     SmartDashboard.putNumber("Error", error);
-    SmartDashboard.putNumber("Adjusted Right Side Speed", leftSpeed + turn); // right side is underturning, so only adjust R motors
+    SmartDashboard.putNumber("Integral", integral);
+    SmartDashboard.putNumber("Derivative", derivative);
+    SmartDashboard.putNumber("Adjusted Right Side Speed", rightSpeed + turn); // right side is underturning, so only adjust R motors
   }
 
   public boolean encoderDrive() {
-    leftSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
-    rightSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
+    leftSpeed = Constants.EncoderConstants.LEFT_SPEED;
+    rightSpeed = Constants.EncoderConstants.RIGHT_SPEED;
 
-    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
+    if(averageDisplacement <= Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       getCorrection(); // updates turn
       SmartDashboard.putNumber("left speed", leftSpeed);
