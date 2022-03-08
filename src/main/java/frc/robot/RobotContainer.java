@@ -83,6 +83,7 @@ public class RobotContainer {
     joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
     less.whenPressed(new InstantCommand(shooter::decrease, shooter));
     more.whenPressed(new InstantCommand(shooter::increase, shooter));
+    // its (cheezit)!
     //pidButton.whenPressed(new ConditionalCommand(new InstantCommand(shooter::enable), new InstantCommand(shooter::disable), shooter::getOnOffFlag));
     //climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     //encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
