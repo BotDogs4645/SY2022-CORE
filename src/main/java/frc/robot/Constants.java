@@ -54,13 +54,13 @@ public final class Constants {
         public final static int SHOOTIE_ID = 13;
         public final static int LOADIE_ID = 12;
 
-        public static final double SHOOTIE_RPM_SETPOINT = 5600.0; // 1560
-        public static final double LOADIE_RPM_SETPOINT = 5600.0;
+        public static double SHOOTIE_RPM_SETPOINT = 6350.0; // 1560
+        public static double LOADIE_RPM_SETPOINT = 6350.0;
         public static final double MAX_RPM = 6380.0;
 
-        public static final double kP = 0.000525; // .000265 .005 - .1 too low <3 //kU * 0.6;
-        public static final double kI = 0.000005;
-        public static final double kD = 15; // 70
+        public static final double kP = 0.000525; // .000525 .005 - .1 too low <3 //kU * 0.6;
+        public static final double kI = 0;
+        public static final double kD = 5.75; // 70
         public static final double kF = 0.0442818804; // SHOOTIE_RPM_SETPOINT / MAX_RPM; //(1023 * .75) / 2260; // 22600
 
         public static final int SLOT_ID = 0;

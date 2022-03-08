@@ -94,4 +94,21 @@ public class ShooterIntegratedPID extends SubsystemBase {
     return onOffFlag;
   }
 
+  public void increase() {
+    Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT += 100;
+    SmartDashboard.putNumber("actual setpoint :3", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+    if (enabled) {
+      _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+      _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+    }
+  }
+
+  public void decrease() {
+    Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT -= 100;
+    SmartDashboard.putNumber("actual setpoint :3", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+    if (enabled) {
+      _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+      _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+    }
+  }
 }
