@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -27,6 +28,9 @@ public class DriveTrain extends SubsystemBase {
   private double leftSpeed;
   private double rightSpeed;
 
+  SlewRateLimiter filterLeft = new SlewRateLimiter(2);
+  SlewRateLimiter filterRight = new SlewRateLimiter(2);
+  
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
@@ -42,7 +46,7 @@ public class DriveTrain extends SubsystemBase {
   private double error = 0;
   private double prev_error = 0;
   private double integral = 1;
-  private double derivative = 1;
+  private double derivative = 0;
   private double turn = 0;
   private double idealHeading;
 
@@ -65,7 +69,6 @@ public class DriveTrain extends SubsystemBase {
 
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
-
     resetEncoders();
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -73,9 +76,9 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
-    //ahrs.reset(); 
+    ahrs.reset(); 
     idealHeading = ahrs.getYaw(); // sets starting position as "0"
-    drivePID.setTolerance(0);
+    drivePID.setTolerance(1);
     drivePID.setSetpoint(idealHeading); // sets setpoint to initial heading
   }
 
@@ -84,15 +87,19 @@ public class DriveTrain extends SubsystemBase {
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
     leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    SmartDashboard.putNumber("Distance Traveled Left", leftDistanceTraveled);
+
     rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
   }
 
   public void driveWithJoystick() {
-    leftSpeed = driveController.getLeftY();
-    rightSpeed = driveController.getRightY();
-    
+    leftSpeed = filterLeft.calculate(driveController.getLeftY() * -1);
+    rightSpeed = filterRight.calculate(driveController.getRightY() * -1);
+
+    SmartDashboard.putNumber("Teleop Speed", leftSpeed);
+
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
 
@@ -102,35 +109,38 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = 0;
   }
 
+  /* NOT USED */
   public void getCorrection() {
     SmartDashboard.putNumber("Start Heading", idealHeading);
     SmartDashboard.putNumber("Actual Heading", ahrs.getYaw());
-    error = (idealHeading - ahrs.getYaw()); 
+    error = (ahrs.getYaw() - idealHeading);
     prev_error = error;
-    integral += error * .02; // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
-    derivative = (error - prev_error) / .02;
-    turn = ((error * Constants.EncoderConstants.kP) + (integral * 0.0001) + derivative);
-    //turn = ((error * Constants.EncoderConstants.kP) + derivative); 1.26
+    integral += error * .02 * Constants.EncoderConstants.kI; // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
+    derivative = ((error - prev_error) / .02) * Constants.EncoderConstants.kD;
+    turn = error * Constants.EncoderConstants.kP * -1;
 
     SmartDashboard.putNumber("Error", error);
     SmartDashboard.putNumber("Integral", integral);
     SmartDashboard.putNumber("Derivative", derivative);
-    SmartDashboard.putNumber("Adjusted Right Side Speed", rightSpeed + turn); // right side is underturning, so only adjust R motors
+    SmartDashboard.putNumber("Adjusted Right Side Speed with kP", rightSpeed + turn); // right side is underturning, so only adjust R motors
+    SmartDashboard.putNumber("Adjusted Right Side Speed with kP, kI", rightSpeed + (turn + integral));
+    SmartDashboard.putNumber("Adjusted Right Side Speed with kP, kI, kD", rightSpeed + ( turn + integral + derivative) * -1);
   }
 
   public boolean encoderDrive() {
     leftSpeed = Constants.EncoderConstants.LEFT_SPEED;
     rightSpeed = Constants.EncoderConstants.RIGHT_SPEED;
 
-    if(averageDisplacement <= Constants.EncoderConstants.TARGET_DISTANCE_FT) {
+    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       getCorrection(); // updates turn
-      SmartDashboard.putNumber("left speed", leftSpeed);
+      SmartDashboard.putNumber("left speed", leftSpeed); 
       SmartDashboard.putNumber("right speed", rightSpeed);
-      differentialDriveSub.tankDrive(leftSpeed, rightSpeed + turn);
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
       updateAverageDisplacement();
       return true;
     }
+    stop();
     return false;
   }
 

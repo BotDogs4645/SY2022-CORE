@@ -46,9 +46,9 @@ public class Drive extends CommandBase {
     else { 
       DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       driveTrainSubsystem.resetEncoders();
+      driveTrainSubsystem.driveWithJoystick();
     }
   }
-  
 
   // Called once the command ends or is interrupted.
   @Override

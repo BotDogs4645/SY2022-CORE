@@ -72,13 +72,13 @@ public final class Constants {
         public static double WHEEL_DIAMETER_FT = 0.5; // 6 inches, unit of variable is feet
         public static double REVOLUTION_P_FT = 1 / WHEEL_DIAMETER_FT * Math.PI;
 
-        public static double TARGET_DISTANCE_FT = 20; // the distance from the field to the bottom of the vision tape 8.46
+        public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape 8.46
         
-        public static double LEFT_SPEED = 0.55;
-        public static double RIGHT_SPEED = 0.55; 
+        public static double LEFT_SPEED = 0.6;
+        public static double RIGHT_SPEED = 0.6; 
 
-        public static final double kP = 0.0078; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
-        public static final double kI = 1; // NOT USED
-        public static final double kD = 0; // NOT USED
+        public static final double kP = 0.0080; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
+        public static final double kI = 0.00092; // NOT USED
+        public static final double kD = 1; // NOT USED
     }
 }
