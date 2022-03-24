@@ -21,23 +21,29 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.ShooterIntegratedPID;
 import frc.robot.subsystems.Climber;
 
 public class RobotContainer {
  // tank drive motors
- // private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
- // private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
+ private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
+ private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
 
- // private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
- // private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
- // climber motors
- // public final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
- // public final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
-// tank drive motor groups
- // private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
- // private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
+  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
+  private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
+ 
+  // climber motors
+  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
+  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
 
+  // indexer motors
+  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.VERTICAL_INDEXER_MOTOR);
+  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.HORIZONTAL_INDEXER_MOTOR);
+  
+  // tank drive motor groups
+  private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
+  private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
 
   public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER);
@@ -56,19 +62,19 @@ public class RobotContainer {
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
  
   // subsystems
- // public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
- // public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, driveController);
-
+  
+  public final Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
   // commands
-  // public final Drive driveCommand = new Drive(driveSubsystem);
-  // public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
+  public final Drive driveCommand = new Drive(driveSubsystem, indexerSubsystem);
+  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-  //   leftMotors.setInverted(true);
-  //   rightMotors.setInverted(false);
-  //   driveSubsystem.setDefaultCommand(driveCommand);
+     leftMotors.setInverted(true);
+     rightMotors.setInverted(false);
+     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
@@ -84,10 +90,10 @@ public class RobotContainer {
     less.whenPressed(new InstantCommand(shooter::decrease, shooter));
     more.whenPressed(new InstantCommand(shooter::increase, shooter));
     // its (cheezit)!
-    //pidButton.whenPressed(new ConditionalCommand(new InstantCommand(shooter::enable), new InstantCommand(shooter::disable), shooter::getOnOffFlag));
-    //climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
-    //encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
-    //limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
+    pidButton.whenPressed(new ConditionalCommand(new InstantCommand(shooter::enable), new InstantCommand(shooter::disable), shooter::getOnOffFlag));
+    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
+    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
+    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
     
   }
 }
