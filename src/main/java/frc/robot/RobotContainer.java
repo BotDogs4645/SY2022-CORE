@@ -47,7 +47,7 @@ public class RobotContainer {
 
 
   // Controllers
-  public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER); // For while driving functions
+  public final Joystick driveController = new Joystick(Constants.driveConstants.DRIVE_CONTROLLER); // For while driving functions
   public final Joystick joy = new Joystick(Constants.driveConstants.JOYSTICK_CONTROLLER); // For actual driving 
 
   // buttons
