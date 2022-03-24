@@ -22,23 +22,20 @@ import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ShooterIntegratedPID;
 
 public class RobotContainer {
- // tank drive motors
-  private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
-  private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
+  // tank drive motors
+  private static MotorController upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_LEFT_MOTOR);
+  private final MotorController lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_LEFT_MOTOR);
 
-  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
-  private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
- // climber motors
-  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
-  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
- // tank drive motor groups
+  private static MotorController upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
+  private final MotorController lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
+
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
-  public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER);
+  public final XboxController driveController = new XboxController(Constants.DriveConstants.DRIVE_CONTROLLER);
   
-  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
-  public final JoystickButton limelightButton = new JoystickButton(driveController, Constants.gamepadButtons.LIMELIGHT_DRIVE);
+  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.GamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
+  public final JoystickButton limelightButton = new JoystickButton(driveController, Constants.GamepadButtons.LIMELIGHT_DRIVE);
 
    // shooter  --> COMMENTED OUT BC MOTORS ARE MISSING FROM CHASSIS
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
@@ -53,12 +50,12 @@ public class RobotContainer {
 
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
-  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
+  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    leftMotors.setInverted(true);
-    rightMotors.setInverted(false);
+    leftMotors.setInverted(false);
+    rightMotors.setInverted(true);
     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
@@ -70,9 +67,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    joyEnable.whenPressed(new InstantCommand(shooter::enable, shooter));
-    joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
-    //encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
-    //limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
+    // joyEnable.whenPressed(new InstantCommand(shooter::enable, shooter));
+    // joyDisable.whenPressed(new InstantCommand(shooter::disable, shooter));
+    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
+    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.LIMELIGHT_DRIVE));
   }
 }

@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -27,6 +28,9 @@ public class DriveTrain extends SubsystemBase {
   private double leftSpeed;
   private double rightSpeed;
 
+  SlewRateLimiter filterLeft = new SlewRateLimiter(2);
+  SlewRateLimiter filterRight = new SlewRateLimiter(2);
+
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
@@ -37,18 +41,20 @@ public class DriveTrain extends SubsystemBase {
   private WPI_TalonFX encRightMotor;
 
   private double rawEncoderOutLeft;
-  private double rawEncoderOutRight;
+  private double rawEncoderOutRight; 
 
   private double error = 0;
-  private double heading = 0; 
-  private double turnPower = 0;
+  private double prev_error = 0;
+  private double integral = 1;
+  private double derivative = 0;
+  private double turn = 0;
+  private double idealHeading;
 
   private final AHRS ahrs = new AHRS();
-
-  private final PIDController drivePID = new PIDController(Constants.encoderConstants.kP, Constants.encoderConstants.kI, Constants.encoderConstants.kD);
+  
+  private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
   
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
-
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry tv = table.getEntry("tv");
   NetworkTableEntry ta = table.getEntry("ta");
@@ -56,43 +62,44 @@ public class DriveTrain extends SubsystemBase {
 
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
-    driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE;
+    driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
 
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
-
+    
     resetEncoders();
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
-    differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
+    differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
     ahrs.reset(); 
-    heading = Constants.encoderConstants.FLYWHEEL_RPM * ahrs.getAngle(); // incorporates flywheel feedforward
-    drivePID.setTolerance(Constants.encoderConstants.ENCODER_TOLERANCE);
-    drivePID.setSetpoint(heading); // sets setpoint to initial heading
+    idealHeading = ahrs.getYaw(); // sets starting position as "0"
+    drivePID.setTolerance(1);
+    drivePID.setSetpoint(idealHeading); // sets setpoint to initial heading
   }
 
-  public void updateAverageDisplacement() { // still needs to account for margin of error
+  public void updateAverageDisplacement() {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
+    
+    leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    SmartDashboard.putNumber("Distance Traveled Left", leftDistanceTraveled);
 
-    leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_P_REVOLUTION * Constants.encoderConstants.REVOLUTION_P_FT);
-    rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_P_REVOLUTION * Constants.encoderConstants.REVOLUTION_P_FT);
+    rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
   }
 
   public void driveWithJoystick() {
-    leftSpeed = driveController.getLeftY();
-    rightSpeed = driveController.getRightY();
+    leftSpeed = filterLeft.calculate(driveController.getLeftY() * -1);
+    rightSpeed = filterRight.calculate(driveController.getRightY() * -1);
 
-    SmartDashboard.putNumber("Left Speed", leftMotors.get());
-    SmartDashboard.putNumber("Right Speed", rightMotors.get());
+    SmartDashboard.putNumber("Teleop Speed", leftSpeed);
 
     differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
   }
@@ -103,25 +110,38 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = 0;
   }
 
+  /* NOT USED */
   public void getCorrection() {
-    error = heading - ahrs.getAngle();
-    turnPower = error * Constants.encoderConstants.kP;
+    SmartDashboard.putNumber("Start Heading", idealHeading);
+    SmartDashboard.putNumber("Actual Heading", ahrs.getYaw());
+    error = (ahrs.getYaw() - idealHeading);
+    prev_error = error;
+    integral += error * .02 * Constants.EncoderConstants.kI; // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
+    derivative = ((error - prev_error) / .02) * Constants.EncoderConstants.kD;
+    turn = error * Constants.EncoderConstants.kP * -1;
+
+    SmartDashboard.putNumber("Error", error);
+    SmartDashboard.putNumber("Integral", integral);
+    SmartDashboard.putNumber("Derivative", derivative);
+    SmartDashboard.putNumber("Adjusted Right Side Speed with kP", rightSpeed + turn); // right side is underturning, so only adjust R motors
+    SmartDashboard.putNumber("Adjusted Right Side Speed with kP, kI", rightSpeed + (turn + integral));
+    SmartDashboard.putNumber("Adjusted Right Side Speed with kP, kI, kD", rightSpeed + ( turn + integral + derivative) * -1);
   }
 
   public boolean encoderDrive() {
-    leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
-    rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
+    leftSpeed = Constants.EncoderConstants.LEFT_SPEED;
+    rightSpeed = Constants.EncoderConstants.RIGHT_SPEED;
 
-    SmartDashboard.putNumber("leftiespeed", leftSpeed);
-    SmartDashboard.putNumber("rightiespeed", rightSpeed);
-
-    if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
+    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-      getCorrection(); // updates turnPower
-      differentialDriveSub.tankDrive(leftSpeed * turnPower, rightSpeed * turnPower);
+      getCorrection(); // updates turn
+      SmartDashboard.putNumber("left speed", leftSpeed); 
+      SmartDashboard.putNumber("right speed", rightSpeed);
+      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
       updateAverageDisplacement();
       return true;
     }
+    stop();
     return false;
   }
 
@@ -137,10 +157,10 @@ public class DriveTrain extends SubsystemBase {
     double finalRot = 0.0;
 
     if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-      finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset + Constants.driveConstants.MIN_ROT_SPEED;
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
     }
     else if (xOffset > .25) {   // dampens the rotation at the end while turning
-      finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - Constants.driveConstants.MIN_ROT_SPEED;
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
     differentialDriveSub.tankDrive(finalRot, -finalRot);
   }
@@ -150,7 +170,7 @@ public class DriveTrain extends SubsystemBase {
     double radians = Math.toRadians(yOffset);
     double distance;
     
-    distance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
+    distance = ((Constants.LimelightConstants.LIMELIGHT_HEIGHT - Constants.GameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
     SmartDashboard.putNumber("Distance to Target", distance);
     return distance;
   }
