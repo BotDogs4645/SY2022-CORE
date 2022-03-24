@@ -13,17 +13,18 @@ public class Climber extends SubsystemBase {
 
   private CANSparkMax rightClimberMotor;
   private CANSparkMax leftClimberMotor;
+  
   private XboxController driveController;
+
   public static boolean upFlag;
 
   /** Creates a new Climber. */
   public Climber(CANSparkMax rightClimberMotor, CANSparkMax leftClimberMotor, XboxController driveController) {
     this.rightClimberMotor = rightClimberMotor;
     this.rightClimberMotor = rightClimberMotor;
-    this.driveController = driveController;
-
-    
+    this.driveController = driveController;   
   }
+
   public void climberDown() {
     rightClimberMotor.set(-0.5);
     leftClimberMotor.set(-0.5);
@@ -32,8 +33,8 @@ public class Climber extends SubsystemBase {
       leftClimberMotor.set(0);
       upFlag = false;
     }
-
   }
+
   public void climberUp() {
     rightClimberMotor.set(0.5);
     leftClimberMotor.set(0.5);
@@ -43,9 +44,11 @@ public class Climber extends SubsystemBase {
       upFlag = true;
     }
   }
+
   public boolean getUpFlag() {
     return upFlag;
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

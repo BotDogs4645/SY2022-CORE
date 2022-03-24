@@ -18,8 +18,8 @@ public final class Constants {
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
         public static int CLIMBER_BUTTON = 4;
-        public static int PID_BUTTON = 1;
-        public static int GRIP_BUTTON = 6;
+        public static int SHOOTER = 1;
+        public static int GRIP_BUTTON = 7;
     }
 
     public static final class driveConstants {
@@ -33,6 +33,7 @@ public final class Constants {
 
         // joystick ports
         public static final int DRIVE_CONTROLLER = 0;
+        public static final int JOYSTICK_CONTROLLER = 1;
 
         // max output
         public static final double MAX_OUTPUT = 0.75;

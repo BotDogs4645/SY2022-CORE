@@ -11,6 +11,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Timer;
+
 import frc.robot.Constants;
 
 public class ShooterIntegratedPID extends SubsystemBase {
@@ -21,6 +23,8 @@ public class ShooterIntegratedPID extends SubsystemBase {
   private boolean enabled = false;
   private double avg_error = 0;
   private int countee = 0;
+
+  private double lastShotTime = Integer.MAX_VALUE;
 
   public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie) {
     this._talon = shootie;
@@ -75,28 +79,30 @@ public class ShooterIntegratedPID extends SubsystemBase {
       SmartDashboard.putNumber("shootie@avgErr:", avg_error / countee);
     }
   }
-  public void enable() {
-    enabled = true;
-    countee = 0;
-    avg_error = 0;
-    _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-    _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-    onOffFlag = true;
+  
+  public void requestToggle() {
+    enabled = !enabled;
+    if (enabled) {
+      countee = 0;
+      avg_error = 0;
+      _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+      _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+    } else {
+      _talon.set(TalonFXControlMode.Disabled, 0);
+      _talon2.set(TalonFXControlMode.Disabled, 0);
+    }
   }
 
-  public void disable() {
-    enabled = false;
-    _talon.set(TalonFXControlMode.Disabled, 0);
-    _talon2.set(TalonFXControlMode.Disabled, 0);
-    onOffFlag = false;
-  }
-  public boolean getOnOffFlag() {
-    return onOffFlag;
+  public boolean shooterCooldown() {
+    if (Timer.getFPGATimestamp() - lastShotTime > 2/3 && Timer.getFPGATimestamp() > 2/3) {
+      return true;
+    }
+    return false;
   }
 
   public void increase() {
     Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT += 100;
-    SmartDashboard.putNumber("actual setpoint :3", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+    SmartDashboard.putNumber("actual setpoint: ", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
     if (enabled) {
       _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
       _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
