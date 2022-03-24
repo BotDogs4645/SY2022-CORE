@@ -1,37 +1,31 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.CAN;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.ChangeDriveMode;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+
 import frc.robot.commands.Drive;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.ShooterIntegratedPID;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.commands.ChangeDriveMode;
+import frc.robot.subsystems.ShooterIntegratedPID;
 
 public class RobotContainer {
  // tank drive motors
- private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
- private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
+ private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_LEFT_MOTOR);
+ private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_LEFT_MOTOR);
 
-  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
-  private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
+  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
+  private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
   private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
@@ -48,20 +42,14 @@ public class RobotContainer {
 
   // Controllers
   public final Joystick driveController = new Joystick(Constants.DriveConstants.DRIVE_CONTROLLER);
-  public final XboxController buttonController  = new XboxController(Constants.driveConstants.BUTTON_CONTROLLER); // For actual driving 
+  public final XboxController buttonController  = new XboxController(Constants.DriveConstants.BUTTON_CONTROLLER); 
 
   // buttons
-  public final JoystickButton encoderButton = new JoystickButton(buttonController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
-  public final JoystickButton limelightButton = new JoystickButton(buttonController, Constants.gamepadButtons.LIMELIGHT_DRIVE);
-  public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.gamepadButtons.CLIMBER_BUTTON);
-  public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.gamepadButtons.SHOOTER);
-  // Setpoint will automatically be managed by the Limelight. No need for manual instruction of the shooter's rpm.
-  // public final JoystickButton rpmDecrease = new JoystickButton(driveController, 3);
-  // public final JoystickButton rpmIncrease = new JoystickButton(driveController, 2);
+  public final JoystickButton encoderButton = new JoystickButton(buttonController, Constants.GamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
+  public final JoystickButton limelightButton = new JoystickButton(buttonController, Constants.GamepadButtons.LIMELIGHT_DRIVE);
+  public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON);
+  public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
 
-  //public final JoystickButton gripButton = new JoystickButton(driveController, Constants.gamepadButtons.GRIP_BUTTON);
-  // fix these button constants, they overlap -
-   // shooter  --> COMMENTED OUT BC MOTORS ARE MISSING FROM CHASSIS
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
  
@@ -74,7 +62,7 @@ public class RobotContainer {
   
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
-  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
+  public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -93,7 +81,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
     climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
-    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
-    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.LIMELIGHT_DRIVE));
+    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
+    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.LIMELIGHT_DRIVE));
   }
 }
