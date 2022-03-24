@@ -30,7 +30,7 @@ public class DriveTrain extends SubsystemBase {
 
   SlewRateLimiter filterLeft = new SlewRateLimiter(2);
   SlewRateLimiter filterRight = new SlewRateLimiter(2);
-  
+
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
@@ -69,6 +69,7 @@ public class DriveTrain extends SubsystemBase {
 
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
+    
     resetEncoders();
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -85,7 +86,7 @@ public class DriveTrain extends SubsystemBase {
   public void updateAverageDisplacement() {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
-
+    
     leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
     SmartDashboard.putNumber("Distance Traveled Left", leftDistanceTraveled);
 
