@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.vision.VisionPipeline;
 import edu.wpi.first.vision.VisionThread;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -29,11 +30,11 @@ public class DriveTrain extends SubsystemBase {
   public static int driveMode;
   public double averageDisplacement;
 
-  private XboxController driveController;
+  private Joystick driveController;
   private final DifferentialDrive differentialDriveSub;
 
-  private double leftSpeed;
-  private double rightSpeed;
+  private double driveSpeed;
+  private double turnSpeed;
 
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
@@ -67,7 +68,7 @@ public class DriveTrain extends SubsystemBase {
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry ty = table.getEntry("ty");
 
-  public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, XboxController driveController, MotorController encLeftMotor, MotorController encRightMotor) {
+  public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
     driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE;
 
@@ -101,13 +102,15 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void driveWithJoystick() {
-    leftSpeed = driveController.getLeftY();
-    rightSpeed = driveController.getRightY();
+   // leftSpeed = driveController.getLeftY();
+   // rightSpeed = driveController.getRightY();
+    driveSpeed = driveController.getY();
+    turnSpeed = driveController.getZ();
 
     SmartDashboard.putNumber("Left Speed", leftMotors.get());
     SmartDashboard.putNumber("Right Speed", rightMotors.get());
 
-    differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+    differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
   }
 
   public void resetEncoders() {
@@ -122,16 +125,16 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public boolean encoderDrive() {
-    leftSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
-    rightSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
+    driveSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
+    turnSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
 
-    SmartDashboard.putNumber("leftiespeed", leftSpeed);
-    SmartDashboard.putNumber("rightiespeed", rightSpeed);
+    SmartDashboard.putNumber("drive speed", driveSpeed);
+    SmartDashboard.putNumber("turn rate", turnSpeed);
 
     if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
      // getCorrection(); // updates turn
-      differentialDriveSub.tankDrive(leftSpeed, rightSpeed);  //rightSpeed + turn);
+      differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);  //rightSpeed + turn);
       updateAverageDisplacement();
       return true;
     }
@@ -139,9 +142,9 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void stop() {
-    leftSpeed = 0;
-    rightSpeed = 0;
-    differentialDriveSub.tankDrive(leftSpeed, rightSpeed);
+    driveSpeed = 0;
+    turnSpeed = 0;
+    differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
   }
 
   public void trackObject() {
