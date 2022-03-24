@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 /**
@@ -14,7 +10,7 @@ package frc.robot;
  */
 public final class Constants {
     public static final class gamepadButtons {
-		public static int JOYSTICK_DRIVE = 6;
+		    public static int JOYSTICK_DRIVE = 6;
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
         public static int CLIMBER_BUTTON = 4;
@@ -22,7 +18,7 @@ public final class Constants {
         public static int GRIP_BUTTON = 7;
     }
 
-    public static final class driveConstants {
+    public static final class DriveConstants {
         // left motor ports
         public static final int UPPER_LEFT_MOTOR = 10;
         public static final int LOWER_LEFT_MOTOR = 7;
@@ -43,12 +39,13 @@ public final class Constants {
         public static final double ROT_MULTIPLIER = -0.05;
     }
 
-    public static final class limelightConstants {
+    public static final class LimelightConstants {
         public static final double LIMELIGHT_HEIGHT = 3.25; // distance from ground in inches
     }
 
-    public static final class gameConstants {
+    public static final class GameConstants {
         public static final double GOAL_HEIGHT = 57.5; //in inches
+        public static final double ITERATIVE_TIME = 0.02;
     } 
 
     public static final class IntegratedShooterPID {
@@ -71,28 +68,26 @@ public final class Constants {
         public static final double CONVERSION_RATE = 2048.0 / 600.0; // conversion to RPM
     }
     
-    public static final class encoderConstants {
-        public static int k_UNITS_PREVOLUTION = 2048;
-        public static double WHEEL_DIAMETERFT = 0.5; // 6 inches, unit of variable is feet
-        public static double REVOLUTION_PFT = 1 / WHEEL_DIAMETERFT * Math.PI;
-
-        public static double TARGET_DISTANCEFT = 1.5; //8.46; // the distance from the field to the bottom of the vision tape
-        
+    public static final class EncoderConstants {
+        public static int k_UNITS_P_REVOLUTION = 2048;
+        public static double WHEEL_DIAMETER_FT = 0.5; // 6 inches, unit of variable is feet
+        public static double REVOLUTION_P_FT = 1 / WHEEL_DIAMETER_FT * Math.PI;
+      
+        public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape 8.46
+      
         public static double LEFT_SPEED = 0.6;
-        public static double RIGHT_SPEED = 0.6;
-        public static double kP = 0;
-        public static double kI = 0;
-        public static double kD = 0;
-
-        public static int k_UNITS_P_REVOLUTION = 2048; //# of raw encoder units per revolution
-        public static double FLYWHEEL_RPM = 0;      //    <-
-        public static double ENCODER_TOLERANCE = 0; // SHARON!! these constants weren't on github, if you could take a look that would be awesome 
-        public static double REVOLUTION_P_FT = 0;   //    <-
+        public static double RIGHT_SPEED = 0.6; 
     }
+  
     public static final class climberConstants {
         public static int RIGHT_CLIMBER_ID = 4; //PLACEHOLDERS
         public static int LEFT_CLIMBER_ID = 5;
+
+        public static final double kP = 0.0080; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
+        public static final double kI = 0.00092; // NOT USED
+        public static final double kD = 1; // NOT USED
     }
+  
     public static final class indexerConstants {
         public static int VERTICAL_INDEXER_MOTOR  = 6; //PLACEHOLDERS
         public static int HORIZONTAL_INDEXER_MOTOR = 7;

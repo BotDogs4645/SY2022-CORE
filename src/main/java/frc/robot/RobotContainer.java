@@ -47,14 +47,14 @@ public class RobotContainer {
 
 
   // Controllers
-  public final Joystick driveController = new Joystick(Constants.driveConstants.DRIVE_CONTROLLER); // For while driving functions
-  public final Joystick joy = new Joystick(Constants.driveConstants.JOYSTICK_CONTROLLER); // For actual driving 
+  public final Joystick driveController = new Joystick(Constants.DriveConstants.DRIVE_CONTROLLER);
+  public final XboxController buttonController  = new XboxController(Constants.driveConstants.BUTTON_CONTROLLER); // For actual driving 
 
   // buttons
-  public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
-  public final JoystickButton limelightButton = new JoystickButton(driveController, Constants.gamepadButtons.LIMELIGHT_DRIVE);
-  public final JoystickButton climbButton = new JoystickButton(driveController, Constants.gamepadButtons.CLIMBER_BUTTON);
-  public final JoystickButton shooterButton = new JoystickButton(driveController, Constants.gamepadButtons.SHOOTER);
+  public final JoystickButton encoderButton = new JoystickButton(buttonController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
+  public final JoystickButton limelightButton = new JoystickButton(buttonController, Constants.gamepadButtons.LIMELIGHT_DRIVE);
+  public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.gamepadButtons.CLIMBER_BUTTON);
+  public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.gamepadButtons.SHOOTER);
   // Setpoint will automatically be managed by the Limelight. No need for manual instruction of the shooter's rpm.
   // public final JoystickButton rpmDecrease = new JoystickButton(driveController, 3);
   // public final JoystickButton rpmIncrease = new JoystickButton(driveController, 2);
@@ -71,8 +71,9 @@ public class RobotContainer {
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, driveController);
   
   public final Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
+  
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem, indexerSubsystem);
+  public final Drive driveCommand = new Drive(driveSubsystem);
   public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.gamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */

@@ -35,25 +35,27 @@ public class Drive extends CommandBase {
     //indexer constantly running
     indexerSubsystem.indexCargo();
 
-    if(DriveTrain.driveMode == Constants.gamepadButtons.LIMELIGHT_DRIVE) { // 1
+    if(DriveTrain.driveMode == Constants.GamepadButtons.LIMELIGHT_DRIVE) { // HMM
       ledMode.setNumber(1);
       driveTrainSubsystem.trackObject();
     }
-    else if(DriveTrain.driveMode == Constants.gamepadButtons.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
-      driveTrainSubsystem.encoderDrive();
-      ledMode.setNumber(0);
-      if (driveTrainSubsystem.averageDisplacement >= Constants.encoderConstants.TARGET_DISTANCEFT)
-      {
+    else if(DriveTrain.driveMode == Constants.GamepadButtons.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
+      if(driveTrainSubsystem.encoderDrive() == true) {
+        driveTrainSubsystem.encoderDrive();
+        ledMode.setNumber(0); // OFF
+      }
+      else {
         ledMode.setNumber(1);
         driveTrainSubsystem.trackObject();
+        DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
       }
-  }
+    }
     else { 
-      DriveTrain.driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+      DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       driveTrainSubsystem.resetEncoders();
+      driveTrainSubsystem.driveWithJoystick();
     }
   }
-  
 
   // Called once the command ends or is interrupted.
   @Override
