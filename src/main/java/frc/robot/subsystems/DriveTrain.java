@@ -60,7 +60,7 @@ public class DriveTrain extends SubsystemBase {
 
   private final AHRS ahrs = new AHRS();
 
-  private final PIDController drivePID = new PIDController(Constants.encoderConstants.kP, Constants.encoderConstants.kI, Constants.encoderConstants.kD);
+  private final PIDController drivePID = new PIDController(1,1,1);
   
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
 
@@ -84,11 +84,11 @@ public class DriveTrain extends SubsystemBase {
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
-    differentialDriveSub.setMaxOutput(Constants.driveConstants.MAX_OUTPUT);
+    differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
     ahrs.reset(); 
-    heading = Constants.encoderConstants.FLYWHEEL_RPM * ahrs.getAngle(); // incorporates flywheel feedforward
-    drivePID.setTolerance(Constants.encoderConstants.ENCODER_TOLERANCE);
+    heading = ahrs.getAngle(); // incorporates flywheel feedforward
+    drivePID.setTolerance(1);
     drivePID.setSetpoint(heading); // sets setpoint to initial heading
   }
 
@@ -96,8 +96,8 @@ public class DriveTrain extends SubsystemBase {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
 
-    leftDistanceTraveled = rawEncoderOutLeft / (Constants.encoderConstants.k_UNITS_P_REVOLUTION * Constants.encoderConstants.REVOLUTION_P_FT);
-    rightDistanceTraveled = rawEncoderOutRight / (Constants.encoderConstants.k_UNITS_P_REVOLUTION * Constants.encoderConstants.REVOLUTION_P_FT);
+    leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
   }
@@ -122,17 +122,17 @@ public class DriveTrain extends SubsystemBase {
 
   public void getCorrection() {
     error = heading - ahrs.getAngle();
-    turnPower = error * Constants.encoderConstants.kP;
+    turnPower = error * 1;
   }
 
   public boolean encoderDrive() {
-    driveSpeed = Constants.encoderConstants.LEFT_SPEED * -1;
-    turnSpeed = Constants.encoderConstants.RIGHT_SPEED * -1;
+    driveSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
+    turnSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
 
     SmartDashboard.putNumber("drive speed", driveSpeed);
     SmartDashboard.putNumber("turn rate", turnSpeed);
 
-    if(averageDisplacement < Constants.encoderConstants.TARGET_DISTANCEFT) {
+    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
      // getCorrection(); // updates turn
       differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);  //rightSpeed + turn);
@@ -154,10 +154,10 @@ public class DriveTrain extends SubsystemBase {
     double finalRot = 0.0;
 
     if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-      finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset + Constants.driveConstants.MIN_ROT_SPEED;
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
     }
     else if (xOffset > .25) {   // dampens the rotation at the end while turning
-      finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - Constants.driveConstants.MIN_ROT_SPEED;
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
 
     if (Math.abs(xOffset) < 1.5) {
@@ -186,10 +186,10 @@ public class DriveTrain extends SubsystemBase {
       double centerX = r.x;
 
       if (centerX < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-        finalRot = Constants.driveConstants.ROT_MULTIPLIER * centerX + Constants.driveConstants.MIN_ROT_SPEED;
+        finalRot = Constants.DriveConstants.ROT_MULTIPLIER * centerX + Constants.DriveConstants.MIN_ROT_SPEED;
       }
       else if (centerX > .25) {   // dampens the rotation at the end while turning
-        finalRot = Constants.driveConstants.ROT_MULTIPLIER * centerX - Constants.driveConstants.MIN_ROT_SPEED;
+        finalRot = Constants.DriveConstants.ROT_MULTIPLIER * centerX - Constants.DriveConstants.MIN_ROT_SPEED;
       }
       differentialDriveSub.tankDrive(finalRot, -finalRot);
     }

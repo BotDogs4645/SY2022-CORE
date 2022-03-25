@@ -27,11 +27,11 @@ import frc.robot.subsystems.Climber;
 
 public class RobotContainer {
  // tank drive motors
- private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_LEFT_MOTOR);
- private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_LEFT_MOTOR);
+ private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_LEFT_MOTOR);
+ private final WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_LEFT_MOTOR);
 
-  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.driveConstants.UPPER_RIGHT_MOTOR);
-  private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.driveConstants.LOWER_RIGHT_MOTOR);
+  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
+  private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
   private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
@@ -47,8 +47,8 @@ public class RobotContainer {
 
 
   // Controllers
-  public final XboxController driveController = new XboxController(Constants.driveConstants.DRIVE_CONTROLLER); // For while driving functions
-  public final Joystick joy = new Joystick(Constants.driveConstants.JOYSTICK_CONTROLLER); // For actual driving 
+  public final XboxController driveController = new XboxController(Constants.DriveConstants.DRIVE_CONTROLLER); // For while driving functions
+  public final Joystick joy = new Joystick(Constants.DriveConstants.JOYSTICK_CONTROLLER); // For actual driving 
 
   // buttons
   public final JoystickButton encoderButton = new JoystickButton(driveController, Constants.gamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
