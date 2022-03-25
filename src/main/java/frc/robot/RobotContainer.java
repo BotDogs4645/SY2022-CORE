@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -28,17 +27,16 @@ public class RobotContainer {
   private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
-  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
-  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
+  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.ClimberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
+  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.ClimberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
 
   // indexer motors
-  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.VERTICAL_INDEXER_MOTOR);
-  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.HORIZONTAL_INDEXER_MOTOR);
+  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.VERTICAL_INDEXER_MOTOR);
+  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.HORIZONTAL_INDEXER_MOTOR);
   
   // tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
-
 
   // Controllers
   public final Joystick driveController = new Joystick(Constants.DriveConstants.DRIVE_CONTROLLER);
@@ -56,32 +54,25 @@ public class RobotContainer {
   // subsystems
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
-  public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, driveController);
-  
+  public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController);
   public final Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
   
   // commands
-  public final Drive driveCommand = new Drive(driveSubsystem);
+  public final Drive driveCommand = new Drive(driveSubsystem, indexerSubsystem);
   public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-     leftMotors.setInverted(true);
-     rightMotors.setInverted(false);
-     driveSubsystem.setDefaultCommand(driveCommand);
+    leftMotors.setInverted(true);
+    rightMotors.setInverted(false);
+    driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   private void configureButtonBindings() {
     shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
-    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
     limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.LIMELIGHT_DRIVE));
+    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
   }
 }

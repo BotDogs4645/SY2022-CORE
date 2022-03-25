@@ -8,7 +8,6 @@ import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 
-
 public class Drive extends CommandBase {
 
   private DriveTrain driveTrainSubsystem;
@@ -18,7 +17,7 @@ public class Drive extends CommandBase {
 
   public Drive(DriveTrain subsystem, Indexer indexerSubsystem) {
     driveTrainSubsystem = subsystem;
-    indexerSubsystem = indexerSubsystem;
+    this.indexerSubsystem = indexerSubsystem;
     addRequirements(driveTrainSubsystem);
     addRequirements(indexerSubsystem);
   }
