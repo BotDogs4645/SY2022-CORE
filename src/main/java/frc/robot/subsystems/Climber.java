@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -14,16 +15,16 @@ public class Climber extends SubsystemBase {
   private CANSparkMax rightClimberMotor;
   private CANSparkMax leftClimberMotor;
   
-  private XboxController driveController;
+  private Joystick driveController;
 
   public static boolean upFlag;
 
   /** Creates a new Climber. */
-  public Climber(CANSparkMax rightClimberMotor, CANSparkMax leftClimberMotor, XboxController driveController) {
+  public Climber(CANSparkMax rightClimberMotor, CANSparkMax leftClimberMotor, Joystick driveController) {
     this.rightClimberMotor = rightClimberMotor;
     this.rightClimberMotor = rightClimberMotor;
-    this.driveController = driveController;   
-  }
+    this.driveController = driveController;
+    }
 
   public void climberDown() {
     rightClimberMotor.set(-0.5);

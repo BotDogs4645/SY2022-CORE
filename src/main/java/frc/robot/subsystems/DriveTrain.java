@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -37,6 +38,9 @@ public class DriveTrain extends SubsystemBase {
   private double driveSpeed;
   private double turnSpeed;
 
+  SlewRateLimiter filterLeft = new SlewRateLimiter(2);
+  SlewRateLimiter filterRight = new SlewRateLimiter(2);
+
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
 
@@ -47,11 +51,14 @@ public class DriveTrain extends SubsystemBase {
   private WPI_TalonFX encRightMotor;
 
   private double rawEncoderOutLeft;
-  private double rawEncoderOutRight;
+  private double rawEncoderOutRight; 
 
   private double error = 0;
-  private double heading = 0; 
-  private double turnPower = 0;
+  private double prev_error = 0;
+  private double integral = 1;
+  private double derivative = 0;
+  private double turn = 0;
+  private double idealHeading;
 
   private VisionThread VisionThread;
 
@@ -60,10 +67,7 @@ public class DriveTrain extends SubsystemBase {
 
   private final AHRS ahrs = new AHRS();
 
-  private final PIDController drivePID = new PIDController(1,1,1);
-  
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
-
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry tv = table.getEntry("tv");
   NetworkTableEntry ta = table.getEntry("ta");
@@ -71,14 +75,14 @@ public class DriveTrain extends SubsystemBase {
 
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
-    driveMode = Constants.gamepadButtons.JOYSTICK_DRIVE;
+    driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
 
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
-
+    
     resetEncoders();
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     this.encRightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -86,15 +90,14 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
-    ahrs.reset(); 
-    heading = ahrs.getAngle(); // incorporates flywheel feedforward
-    drivePID.setTolerance(1);
-    drivePID.setSetpoint(heading); // sets setpoint to initial heading
+    ahrs.reset();
   }
-
-  public void updateAverageDisplacement() { // still needs to account for margin of error
+   
+  public void updateAverageDisplacement() {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
+    leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
+    SmartDashboard.putNumber("Distance Traveled Left", leftDistanceTraveled);
 
     leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
     rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
@@ -108,9 +111,6 @@ public class DriveTrain extends SubsystemBase {
     driveSpeed = driveController.getY();
     turnSpeed = driveController.getZ();
 
-    SmartDashboard.putNumber("Left Speed", leftMotors.get());
-    SmartDashboard.putNumber("Right Speed", rightMotors.get());
-
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
   }
 
@@ -118,11 +118,6 @@ public class DriveTrain extends SubsystemBase {
     this.encLeftMotor.setSelectedSensorPosition(0);
     this.encRightMotor.setSelectedSensorPosition(0);
     averageDisplacement = 0;
-  }
-
-  public void getCorrection() {
-    error = heading - ahrs.getAngle();
-    turnPower = error * 1;
   }
 
   public boolean encoderDrive() {
@@ -139,6 +134,7 @@ public class DriveTrain extends SubsystemBase {
       updateAverageDisplacement();
       return true;
     }
+    stop();
     return false;
   }
 

@@ -9,7 +9,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final class gamepadButtons {
+    public static final class GamepadButtons {
 		    public static int JOYSTICK_DRIVE = 6;
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
