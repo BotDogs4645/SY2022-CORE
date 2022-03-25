@@ -66,7 +66,7 @@ public class RobotContainer {
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
  
   // subsystems
-  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, joy, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, driveController);
   

@@ -44,11 +44,12 @@ public final class Constants {
     }
 
     public static final class limelightConstants {
-        public static final double LIMELIGHT_HEIGHT = 3.25; // distance from ground in inches
+        public static final double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
     }
 
     public static final class gameConstants {
-        public static final double GOAL_HEIGHT = 57.5; //in inches
+        public static final double LOW_GOAL_HEIGHT = 57.5; //in inches
+        public static final double HIGH_GOAL_HEIGHT = 104;
     } 
 
     public static final class IntegratedShooterPID {

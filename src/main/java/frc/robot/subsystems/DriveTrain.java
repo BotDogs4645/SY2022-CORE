@@ -28,6 +28,7 @@ import edu.wpi.first.vision.VisionPipeline;
 public class DriveTrain extends SubsystemBase {
 
   public static int driveMode;
+  public static boolean alignedToHub;
   public double averageDisplacement;
 
   private Joystick driveController;
@@ -158,18 +159,14 @@ public class DriveTrain extends SubsystemBase {
     else if (xOffset > .25) {   // dampens the rotation at the end while turning
       finalRot = Constants.driveConstants.ROT_MULTIPLIER * xOffset - Constants.driveConstants.MIN_ROT_SPEED;
     }
+
+    if (Math.abs(xOffset) < 1.5) {
+      alignedToHub = true;
+    }
+
     differentialDriveSub.tankDrive(finalRot, -finalRot);
   }
 
-  public double getDistance() {
-    double yOffset = ty.getDouble(0.0);
-    double radians = Math.toRadians(yOffset);
-    double distance;
-    
-    distance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
-    SmartDashboard.putNumber("Distance to Target", distance);
-    return distance;
-  }
   // grip declarations
   public void declareGrip() {
     UsbCamera cam = new UsbCamera("GRIP Cam","/dev/video0");

@@ -4,21 +4,36 @@
 
 package frc.robot.subsystems;
 
+import java.lang.reflect.Executable;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.Constants.IntegratedShooterPID;
+import frc.robot.commands.Drive;
 
 public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX _talon;
   private WPI_TalonFX _talon2;
   private boolean onOffFlag;
+
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
+
+  NetworkTableEntry tx = table.getEntry("tx");
+  NetworkTableEntry tv = table.getEntry("tv");
+  NetworkTableEntry ta = table.getEntry("ta");
+  NetworkTableEntry ty = table.getEntry("ty");
 
   private boolean enabled = false;
   private double avg_error = 0;
@@ -77,7 +92,35 @@ public class ShooterIntegratedPID extends SubsystemBase {
       avg_error += _talon.getClosedLoopError();
       countee++;
       SmartDashboard.putNumber("shootie@avgErr:", avg_error / countee);
+
+      if (DriveTrain.alignedToHub) {
+        double distance = getDistanceFromHub();
+        double exitVelocity;
+        double RPMConversion;
+        if (distance < 11.811) {
+          exitVelocity = ((-0.00354 * Math.pow(distance, 2)) + (.348 * distance) + (2.38));
+        } else {
+          exitVelocity = ((.00107 * Math.pow(distance, 2)) + (.111 * distance) + (6.28));
+        }
+
+        RPMConversion = Math.pow(exitVelocity / .703595, 3.57002606);
+
+        Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT = RPMConversion + 200;
+        Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT = RPMConversion;
+        
+        SmartDashboard.putNumber("exitVeloReq@", exitVelocity);
+        SmartDashboard.putNumber("distanceFromHub@", distance);
+      }
     }
+  }
+
+  public double getDistanceFromHub() {
+    double yOffset = ty.getDouble(0.0);
+    double radians = Math.toRadians(yOffset);
+    double distance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
+
+    SmartDashboard.putNumber("Distance to Target", distance);
+    return distance;
   }
   
   public void requestToggle() {
@@ -100,21 +143,21 @@ public class ShooterIntegratedPID extends SubsystemBase {
     return false;
   }
 
-  public void increase() {
-    Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT += 100;
-    SmartDashboard.putNumber("actual setpoint: ", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
-    if (enabled) {
-      _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-      _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-    }
-  }
+  // piece of shit
+  // public void increase() {
+  //   Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT += 100;
+  //   SmartDashboard.putNumber("actual setpoint: ", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+  //   if (enabled) {
+  //     _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+  //     _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+  //   }
+  // }
 
-  public void decrease() {
-    Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT -= 100;
-    SmartDashboard.putNumber("actual setpoint :3", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
-    if (enabled) {
-      _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-      _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-    }
-  }
+  // public void decrease() {
+  //   SmartDashboard.putNumber("actual setpoint: ", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+  //   if (enabled) {
+  //     _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+  //     _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+  //   }
+  // }
 }
