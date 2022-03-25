@@ -23,7 +23,9 @@ public class ShooterIntegratedPID extends SubsystemBase {
   NetworkTableEntry tv = table.getEntry("tv");
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry ty = table.getEntry("ty");
+  NetworkTableEntry limeMode = table.getEntry("ledMode");
 
+  private boolean limeOn = false;
   private boolean enabled = false;
   private double avg_error = 0;
   private int countee = 0;
@@ -73,6 +75,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     if (enabled) {
       SmartDashboard.putNumber("shootie@errorRpm:", _talon.getClosedLoopError(0));
       SmartDashboard.putNumber("shootie@target:", _talon.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID) / Constants.IntegratedShooterPID.CONVERSION_RATE);
@@ -81,6 +84,11 @@ public class ShooterIntegratedPID extends SubsystemBase {
       avg_error += _talon.getClosedLoopError();
       countee++;
       SmartDashboard.putNumber("shootie@avgErr:", avg_error / countee);
+
+      if (!limeOn) {
+        limeOn = true;
+        limeMode.setDouble(0.0);
+      }
 
       if (DriveTrain.alignedToHub) {
         double distance = getDistanceFromHub();
@@ -99,6 +107,9 @@ public class ShooterIntegratedPID extends SubsystemBase {
         
         SmartDashboard.putNumber("exitVeloReq@", exitVelocity);
         SmartDashboard.putNumber("distanceFromHub@", distance);
+      } else {
+        limeOn = false;
+        limeMode.setDouble(1.0);
       }
     }
   }
@@ -106,11 +117,14 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public double getDistanceFromHub() {
     double yOffset = ty.getDouble(0.0);
     double radians = Math.toRadians(yOffset);
+    //In footsies vv
     double limeDistance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
-  
-    double exitDistance = Math.pow((Math.pow((Math.pow(limeDistance, 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
+    //Ball exit distance as a funtion of limelight distance; converts from feet to m and returns m
+    double exitDistanceMeters = Math.pow((Math.pow((Math.pow((limeDistance*.3048), 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
 
-    return exitDistance;
+    double exitDistanceFeet = exitDistanceMeters * 3.28084; //back to footsies
+
+    return exitDistanceFeet;
   }
   
   public void requestToggle() {

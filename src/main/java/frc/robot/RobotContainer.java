@@ -44,7 +44,6 @@ public class RobotContainer {
 
   // buttons
   public final JoystickButton encoderButton = new JoystickButton(buttonController, Constants.GamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
-  public final JoystickButton limelightButton = new JoystickButton(buttonController, Constants.GamepadButtons.LIMELIGHT_DRIVE);
   public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON);
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
 
@@ -73,6 +72,5 @@ public class RobotContainer {
     shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
     climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
-    limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.LIMELIGHT_DRIVE));
   }
 }
