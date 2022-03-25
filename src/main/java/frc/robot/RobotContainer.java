@@ -1,29 +1,22 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.CAN;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.ChangeDriveMode;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+
 import frc.robot.commands.Drive;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.ShooterIntegratedPID;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.commands.ChangeDriveMode;
+import frc.robot.subsystems.ShooterIntegratedPID;
 
 public class RobotContainer {
  // tank drive motors
@@ -34,34 +27,27 @@ public class RobotContainer {
   private final WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
-  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.climberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
-  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.climberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
+  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.ClimberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
+  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.ClimberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
 
   // indexer motors
-  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.VERTICAL_INDEXER_MOTOR);
-  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.indexerConstants.HORIZONTAL_INDEXER_MOTOR);
+  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.VERTICAL_INDEXER_MOTOR);
+  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.HORIZONTAL_INDEXER_MOTOR);
   
   // tank drive motor groups
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(upperRightMotor, lowerRightMotor);
 
-
   // Controllers
-  public final XboxController driveController = new XboxController(Constants.DriveConstants.DRIVE_CONTROLLER); // For while driving functions
-  public final Joystick buttonController = new Joystick(Constants.DriveConstants.JOYSTICK_CONTROLLER); // For actual driving 
+  public final Joystick driveController = new Joystick(Constants.DriveConstants.DRIVE_CONTROLLER);
+  public final XboxController buttonController  = new XboxController(Constants.DriveConstants.BUTTON_CONTROLLER); 
 
   // buttons
   public final JoystickButton encoderButton = new JoystickButton(buttonController, Constants.GamepadButtons.ENCODER_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
   public final JoystickButton limelightButton = new JoystickButton(buttonController, Constants.GamepadButtons.LIMELIGHT_DRIVE);
   public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON);
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
-  // Setpoint will automatically be managed by the Limelight. No need for manual instruction of the shooter's rpm.
-  // public final JoystickButton rpmDecrease = new JoystickButton(driveController, 3);
-  // public final JoystickButton rpmIncrease = new JoystickButton(driveController, 2);
 
-  //public final JoystickButton gripButton = new JoystickButton(driveController, Constants.GamepadButtons.GRIP_BUTTON);
-  // fix these button constants, they overlap -
-   // shooter  --> COMMENTED OUT BC MOTORS ARE MISSING FROM CHASSIS
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
  
@@ -69,7 +55,6 @@ public class RobotContainer {
   public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, buttonController, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController);
-  
   public final Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
   
   // commands
@@ -78,18 +63,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-     leftMotors.setInverted(true);
-     rightMotors.setInverted(false);
-     driveSubsystem.setDefaultCommand(driveCommand);
+    leftMotors.setInverted(true);
+    rightMotors.setInverted(false);
+    driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   private void configureButtonBindings() {
     shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
     climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));

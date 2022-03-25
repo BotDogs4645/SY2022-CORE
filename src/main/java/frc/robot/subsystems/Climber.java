@@ -1,30 +1,23 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
-
-  private CANSparkMax rightClimberMotor;
-  private CANSparkMax leftClimberMotor;
-  
-  private Joystick driveController;
-
   public static boolean upFlag;
 
-  /** Creates a new Climber. */
-  public Climber(CANSparkMax rightClimberMotor, CANSparkMax leftClimberMotor, Joystick driveController) {
+  private XboxController buttonController;
+
+  private CANSparkMax leftClimberMotor;
+  private CANSparkMax rightClimberMotor;
+
+  public Climber(CANSparkMax rightClimberMotor, CANSparkMax leftClimberMotor, XboxController buttonController) {
+    this.leftClimberMotor = leftClimberMotor;
     this.rightClimberMotor = rightClimberMotor;
-    this.rightClimberMotor = rightClimberMotor;
-    this.driveController = driveController;
-    }
+    this.buttonController = buttonController;
+  }
 
   public void climberDown() {
     rightClimberMotor.set(-0.5);
@@ -51,7 +44,5 @@ public class Climber extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+  public void periodic() {}
 }

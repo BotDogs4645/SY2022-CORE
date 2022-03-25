@@ -4,15 +4,17 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.vision.VisionPipeline;
 import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -20,20 +22,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.GripPipeline;
-import org.opencv.core.Rect;
-import org.opencv.imgproc.Imgproc;
-import java.nio.channels.Pipe;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.vision.VisionPipeline;
 
 public class DriveTrain extends SubsystemBase {
-
   public static int driveMode;
-  public static boolean alignedToHub;
-  public double averageDisplacement;
-
   private Joystick driveController;
-  private final DifferentialDrive differentialDriveSub;
 
   private double driveSpeed;
   private double turnSpeed;
@@ -52,20 +44,20 @@ public class DriveTrain extends SubsystemBase {
 
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight; 
+  private double averageDisplacement;
 
   private double error = 0;
   private double prev_error = 0;
   private double integral = 1;
   private double derivative = 0;
-  private double turn = 0;
+
+  private double turnGyro = 0;
   private double idealHeading;
 
-  private VisionThread VisionThread;
-
   private GripPipeline pipe;
+  private VisionThread VisionThread;
+  public static boolean alignedToHub;
   private Object foundTarget = new Object();
-
-  private final AHRS ahrs = new AHRS();
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
   NetworkTableEntry tx = table.getEntry("tx");
@@ -73,6 +65,10 @@ public class DriveTrain extends SubsystemBase {
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry ty = table.getEntry("ty");
 
+  private final AHRS ahrs = new AHRS();
+  private final DifferentialDrive differentialDriveSub;
+  private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
+  
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
     driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
@@ -96,9 +92,7 @@ public class DriveTrain extends SubsystemBase {
   public void updateAverageDisplacement() {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
-    leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
-    SmartDashboard.putNumber("Distance Traveled Left", leftDistanceTraveled);
-
+    
     leftDistanceTraveled = rawEncoderOutLeft / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
     rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
@@ -106,10 +100,11 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void driveWithJoystick() {
-   // leftSpeed = driveController.getLeftY();
-   // rightSpeed = driveController.getRightY();
     driveSpeed = driveController.getY();
     turnSpeed = driveController.getZ();
+
+    driveSpeed = filterLeft.calculate(driveController.getY() * -1);
+    turnSpeed = filterRight.calculate(driveController.getZ() * -1);
 
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
   }
@@ -126,11 +121,11 @@ public class DriveTrain extends SubsystemBase {
 
     SmartDashboard.putNumber("drive speed", driveSpeed);
     SmartDashboard.putNumber("turn rate", turnSpeed);
-
+  
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
      // getCorrection(); // updates turn
-      differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);  //rightSpeed + turn);
+      differentialDriveSub.arcadeDrive(driveSpeed, 0); 
       updateAverageDisplacement();
       return true;
     }
@@ -144,7 +139,7 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
   }
 
-  public void trackObject() {
+  public void trackObject() { // IN TANK DRIVE!
     double xOffset = -tx.getDouble(0.0);
     SmartDashboard.putNumber("xOffset", xOffset);
     double finalRot = 0.0;
@@ -166,14 +161,13 @@ public class DriveTrain extends SubsystemBase {
   // grip declarations
   public void declareGrip() {
     UsbCamera cam = new UsbCamera("GRIP Cam","/dev/video0");
-  cam.setResolution(480, 720);
-  VisionThread = new VisionThread(cam, new GripPipeline(), pipeline -> {
+    cam.setResolution(480, 720);
+    VisionThread = new VisionThread(cam, new GripPipeline(), pipeline -> {
     synchronized(foundTarget) {
       pipe = pipeline;
     }
-  });
-}
-  
+    });
+  }
 
   public void orientWithGrip() {
     synchronized (foundTarget) {

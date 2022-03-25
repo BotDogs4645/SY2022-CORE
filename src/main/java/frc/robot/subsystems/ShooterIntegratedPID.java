@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import java.lang.reflect.Executable;
@@ -26,7 +22,6 @@ import frc.robot.commands.Drive;
 public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX _talon;
   private WPI_TalonFX _talon2;
-  private boolean onOffFlag;
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
 
@@ -70,15 +65,15 @@ public class ShooterIntegratedPID extends SubsystemBase {
     _talon2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
 
     _talon2.configNominalOutputForward(0, Constants.IntegratedShooterPID.timeoutMS);
-	_talon2.configNominalOutputReverse(0, Constants.IntegratedShooterPID.timeoutMS);
+	  _talon2.configNominalOutputReverse(0, Constants.IntegratedShooterPID.timeoutMS);
     _talon2.configPeakOutputForward(1, Constants.IntegratedShooterPID.timeoutMS);
-	_talon2.configPeakOutputReverse(-1,  Constants.IntegratedShooterPID.timeoutMS);
+	  _talon2.configPeakOutputReverse(-1,  Constants.IntegratedShooterPID.timeoutMS);
 
     _talon2.config_kF(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kF, Constants.IntegratedShooterPID.timeoutMS);
-	_talon2.config_kP(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kP, Constants.IntegratedShooterPID.timeoutMS);
-	_talon2.config_kI(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kI, Constants.IntegratedShooterPID.timeoutMS);
-	_talon2.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
-  _talon2.getSensorCollection().setIntegratedSensorPosition(0, 30);
+	  _talon2.config_kP(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kP, Constants.IntegratedShooterPID.timeoutMS);
+	  _talon2.config_kI(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kI, Constants.IntegratedShooterPID.timeoutMS);
+	  _talon2.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
+    _talon2.getSensorCollection().setIntegratedSensorPosition(0, 30);
     SmartDashboard.putNumber("setpoint@shooter", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
 }
 
