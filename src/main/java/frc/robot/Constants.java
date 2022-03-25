@@ -33,11 +33,11 @@ public final class Constants {
         public static final double ROT_MULTIPLIER = -0.05;
     }
 
-    public static final class limelightConstants {
+    public static final class LimelightConstants {
         public static final double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
     }
 
-    public static final class gameConstants {
+    public static final class GameConstants {
         public static final double LOW_GOAL_HEIGHT = 57.5; //in inches
         public static final double HIGH_GOAL_HEIGHT = 104;
     } 
