@@ -44,15 +44,7 @@ public class DriveTrain extends SubsystemBase {
 
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight; 
-  private double averageDisplacement;
-
-  private double error = 0;
-  private double prev_error = 0;
-  private double integral = 1;
-  private double derivative = 0;
-
-  private double turnGyro = 0;
-  private double idealHeading;
+  public static double averageDisplacement;
 
   private GripPipeline pipe;
   private VisionThread VisionThread;
@@ -116,8 +108,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public boolean encoderDrive() {
-    driveSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
-    turnSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
+    driveSpeed = Constants.EncoderConstants.SPEED * -1;
 
     SmartDashboard.putNumber("drive speed", driveSpeed);
     SmartDashboard.putNumber("turn rate", turnSpeed);

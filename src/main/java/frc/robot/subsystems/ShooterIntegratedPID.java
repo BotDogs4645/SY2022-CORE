@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.lang.reflect.Executable;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -10,14 +8,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.Timer;
-
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
-import frc.robot.Constants.IntegratedShooterPID;
-import frc.robot.commands.Drive;
 
 public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX _talon;
@@ -34,7 +28,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
   private double avg_error = 0;
   private int countee = 0;
 
-  private double lastShotTime = Integer.MAX_VALUE;
+  private static double lastShotTime = Integer.MAX_VALUE;
 
   public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie) {
     this._talon = shootie;
@@ -132,28 +126,10 @@ public class ShooterIntegratedPID extends SubsystemBase {
     }
   }
 
-  public boolean shooterCooldown() {
+  public static boolean shooterCooldown() {
     if (Timer.getFPGATimestamp() - lastShotTime > 2/3 && Timer.getFPGATimestamp() > 2/3) {
       return true;
     }
     return false;
   }
-
-  // piece of shit
-  // public void increase() {
-  //   Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT += 100;
-  //   SmartDashboard.putNumber("actual setpoint: ", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
-  //   if (enabled) {
-  //     _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-  //     _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-  //   }
-  // }
-
-  // public void decrease() {
-  //   SmartDashboard.putNumber("actual setpoint: ", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
-  //   if (enabled) {
-  //     _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-  //     _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-  //   }
-  // }
 }
