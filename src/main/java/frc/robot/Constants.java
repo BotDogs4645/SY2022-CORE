@@ -1,20 +1,14 @@
 package frc.robot;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
     public static final class GamepadButtons {
-		    public static int JOYSTICK_DRIVE = 6;
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
-        public static int CLIMBER_BUTTON = 4;
+		    public static int JOYSTICK_DRIVE = 6;
+        
+        // misc. buttons
         public static int SHOOTER = 1;
+        public static int CLIMBER_BUTTON = 4;
         public static int GRIP_BUTTON = 7;
     }
 
@@ -29,7 +23,7 @@ public final class Constants {
 
         // joystick ports
         public static final int DRIVE_CONTROLLER = 0;
-        public static final int JOYSTICK_CONTROLLER = 1;
+        public static final int BUTTON_CONTROLLER = 1;
 
         // max output
         public static final double MAX_OUTPUT = 0.75;
@@ -54,6 +48,7 @@ public final class Constants {
 
         public static double SHOOTIE_RPM_SETPOINT = 6350.0; // 1560
         public static double LOADIE_RPM_SETPOINT = 6350.0;
+
         public static final double MAX_RPM = 6380.0;
 
         public static final double kP = 0.000525; // .000525 .005 - .1 too low <3 //kU * 0.6;
@@ -75,11 +70,14 @@ public final class Constants {
       
         public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape 8.46
       
-        public static double LEFT_SPEED = 0.6;
-        public static double RIGHT_SPEED = 0.6; 
+        public static double SPEED = 0.6;
+
+        public static final double kP = 0.0080; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
+        public static final double kI = 0.00092; // NOT USED
+        public static final double kD = 1; // NOT USE
     }
   
-    public static final class climberConstants {
+    public static final class ClimberConstants {
         public static int RIGHT_CLIMBER_ID = 4; //PLACEHOLDERS
         public static int LEFT_CLIMBER_ID = 5;
 
@@ -88,7 +86,7 @@ public final class Constants {
         public static final double kD = 1; // NOT USED
     }
   
-    public static final class indexerConstants {
+    public static final class IndexerConstants {
         public static int VERTICAL_INDEXER_MOTOR  = 6; //PLACEHOLDERS
         public static int HORIZONTAL_INDEXER_MOTOR = 7;
     }

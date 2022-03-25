@@ -5,10 +5,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveTrain;
 
 public class ChangeDriveMode extends CommandBase {
-
-  private DriveTrain driveTrainSubsystem;
-  
   private int driveMode;
+  
+  private DriveTrain driveTrainSubsystem;
 
   public ChangeDriveMode(DriveTrain subsystem, int driveMode) {
     driveTrainSubsystem = subsystem;
@@ -22,7 +21,6 @@ public class ChangeDriveMode extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-
   public void execute() {
     DriveTrain.driveMode = driveMode; // change driveMode varibale in subsystem
     CommandScheduler.getInstance().cancel(this);
@@ -30,8 +28,7 @@ public class ChangeDriveMode extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
