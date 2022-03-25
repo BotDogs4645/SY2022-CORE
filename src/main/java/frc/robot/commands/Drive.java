@@ -39,11 +39,10 @@ public class Drive extends CommandBase {
       driveTrainSubsystem.trackObject();
     }
     else if(DriveTrain.driveMode == Constants.GamepadButtons.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
-      if(driveTrainSubsystem.encoderDrive() == true) {
-        driveTrainSubsystem.encoderDrive();
-        ledMode.setNumber(0); // OFF
-      }
-      else {
+      driveTrainSubsystem.encoderDrive();
+      ledMode.setNumber(0);
+      if (driveTrainSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT)
+      {
         ledMode.setNumber(1);
         driveTrainSubsystem.trackObject();
         DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;

@@ -52,7 +52,7 @@ public class RobotContainer {
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
  
   // subsystems
-  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
+  public final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, buttonController, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooter = new ShooterIntegratedPID(shooterMotor, shooterMotor2);
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController);
   public final Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
@@ -71,8 +71,8 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
+    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
     limelightButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.LIMELIGHT_DRIVE));
-    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
   }
 }

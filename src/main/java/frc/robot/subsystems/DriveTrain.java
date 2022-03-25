@@ -25,7 +25,6 @@ import frc.robot.GripPipeline;
 
 public class DriveTrain extends SubsystemBase {
   public static int driveMode;
-
   private Joystick driveController;
 
   private double driveSpeed;
@@ -57,6 +56,7 @@ public class DriveTrain extends SubsystemBase {
 
   private GripPipeline pipe;
   private VisionThread VisionThread;
+  public static boolean alignedToHub;
   private Object foundTarget = new Object();
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
@@ -86,12 +86,9 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub = new DifferentialDrive(leftMotors, rightMotors);
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
-    ahrs.reset(); 
-    idealHeading = ahrs.getYaw(); // sets starting position as "0"
-    drivePID.setTolerance(1);
-    drivePID.setSetpoint(idealHeading); // sets setpoint to initial heading
+    ahrs.reset();
   }
-
+   
   public void updateAverageDisplacement() {
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition();
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1;
@@ -118,20 +115,13 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = 0;
   }
 
-  /* NOT USED */
-  public void getCorrection() {
-    SmartDashboard.putNumber("Start Heading", idealHeading);
-    SmartDashboard.putNumber("Actual Heading", ahrs.getYaw());
-    error = (ahrs.getYaw() - idealHeading);
-    prev_error = error;
-    integral += error * .02 * Constants.EncoderConstants.kI; // Integral is increased by the error*time (which is .02 seconds using normal IterativeRobot)
-    derivative = ((error - prev_error) / .02) * Constants.EncoderConstants.kD;
-    turnGyro = error * Constants.EncoderConstants.kP * -1;
-  }
-
   public boolean encoderDrive() {
-    driveSpeed = Constants.EncoderConstants.SPEED * -1;
+    driveSpeed = Constants.EncoderConstants.LEFT_SPEED * -1;
+    turnSpeed = Constants.EncoderConstants.RIGHT_SPEED * -1;
 
+    SmartDashboard.putNumber("drive speed", driveSpeed);
+    SmartDashboard.putNumber("turn rate", turnSpeed);
+  
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
      // getCorrection(); // updates turn
@@ -160,19 +150,14 @@ public class DriveTrain extends SubsystemBase {
     else if (xOffset > .25) {   // dampens the rotation at the end while turning
       finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
+
+    if (Math.abs(xOffset) < 1.5) {
+      alignedToHub = true;
+    }
+
     differentialDriveSub.tankDrive(finalRot, -finalRot);
   }
 
-  public double getDistance() {
-    double yOffset = ty.getDouble(0.0);
-    double radians = Math.toRadians(yOffset);
-    double distance;
-    
-    distance = ((Constants.LimelightConstants.LIMELIGHT_HEIGHT - Constants.GameConstants.GOAL_HEIGHT)/Math.tan(radians))/12;
-    SmartDashboard.putNumber("Distance to Target", distance);
-    return distance;
-  }
-  
   // grip declarations
   public void declareGrip() {
     UsbCamera cam = new UsbCamera("GRIP Cam","/dev/video0");
