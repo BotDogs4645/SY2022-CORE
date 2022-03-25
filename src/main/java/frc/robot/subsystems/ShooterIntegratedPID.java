@@ -112,10 +112,11 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public double getDistanceFromHub() {
     double yOffset = ty.getDouble(0.0);
     double radians = Math.toRadians(yOffset);
-    double distance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
+    double limeDistance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
+  
+    double exitDistance = Math.pow((Math.pow((Math.pow(limeDistance, 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
 
-    SmartDashboard.putNumber("Distance to Target", distance);
-    return distance;
+    return exitDistance;
   }
   
   public void requestToggle() {
