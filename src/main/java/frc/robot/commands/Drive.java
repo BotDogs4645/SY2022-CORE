@@ -34,22 +34,22 @@ public class Drive extends CommandBase {
     //indexer constantly running
     indexerSubsystem.indexCargo();
 
-    if(DriveTrain.driveMode == Constants.GamepadButtons.LIMELIGHT_DRIVE) { // HMM
+    if(DriveTrain.driveMode == Constants.DriveModes.LIMELIGHT_DRIVE) { // HMM
       ledMode.setNumber(1);
       driveTrainSubsystem.trackObject();
     }
-    else if(DriveTrain.driveMode == Constants.GamepadButtons.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
+    else if(DriveTrain.driveMode == Constants.DriveModes.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
       driveTrainSubsystem.encoderDrive();
       ledMode.setNumber(0);
       if (driveTrainSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT)
       {
         ledMode.setNumber(1);
         driveTrainSubsystem.trackObject();
-        DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
+        DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE;
       }
     }
     else { 
-      DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+      DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       driveTrainSubsystem.resetEncoders();
       driveTrainSubsystem.driveWithJoystick();
     }

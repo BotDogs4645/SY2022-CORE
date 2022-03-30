@@ -1,11 +1,12 @@
 package frc.robot;
 
 public final class Constants {
-    public static final class GamepadButtons {
+    public static final class DriveModes {
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
-		    public static int JOYSTICK_DRIVE = 6;
-        
+		public static int JOYSTICK_DRIVE = 6;
+    }
+    public static final class GamepadButtons {    
         // misc. buttons
         public static int SHOOTER = 1;
         public static int CLIMBER_BUTTON = 4;
@@ -68,6 +69,7 @@ public final class Constants {
         public static double WHEEL_DIAMETER_FT = 0.5; // 6 inches, unit of variable is feet
         public static double REVOLUTION_P_FT = 1 / WHEEL_DIAMETER_FT * Math.PI;
       
+        public static double HALF_TURN = 3748;
         public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape 8.46
       
         public static double SPEED = 0.6;

@@ -44,7 +44,7 @@ public class DriveTrain extends SubsystemBase {
 
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight; 
-  public static double averageDisplacement;
+  public double averageDisplacement;
 
   private GripPipeline pipe;
   private VisionThread VisionThread;
@@ -63,7 +63,7 @@ public class DriveTrain extends SubsystemBase {
   
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
-    driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
+    driveMode = Constants.DriveModes.JOYSTICK_DRIVE;
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
@@ -115,7 +115,7 @@ public class DriveTrain extends SubsystemBase {
   
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-     // getCorrection(); // updates turn
+      // getCorrection(); // updates turn
       differentialDriveSub.arcadeDrive(driveSpeed, 0); 
       updateAverageDisplacement();
       return true;
