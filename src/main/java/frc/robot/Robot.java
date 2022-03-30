@@ -54,9 +54,20 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {}
 
-  /** This function is called periodically during autonomous. */
+  /** Autonomous Sequence assumes that the robot starts out with the robot aligned with a cargo ball
+   *  1. Taxis bot out of tarmac and intakes a cargo
+   *  2. Rotate 180 deg
+   *  3. Call limelight align method and shoot both cargo
+   */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    RobotContainer.driveSubsystem.encoderDrive();
+    if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
+      // insert 180 degrees code
+      RobotContainer.driveSubsystem.trackObject();
+      RobotContainer.shooter.requestToggle();
+    }
+  }
 
   @Override
   public void teleopInit() {
