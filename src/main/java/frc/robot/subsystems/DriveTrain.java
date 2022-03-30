@@ -135,14 +135,14 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("xOffset", xOffset);
     double finalRot = 0.0;
 
-    if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
+    if (xOffset < 1.5) { // 1.5 represents 3/2 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
       finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
     }
-    else if (xOffset > .25) {   // dampens the rotation at the end while turning
+    else if (xOffset > 1.5) {   // dampens the rotation at the end while turning
       finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
 
-    if (Math.abs(xOffset) < 1.5) {
+    if (Math.abs(xOffset) < 3) {
       alignedToHub = true;
     }
 

@@ -39,8 +39,14 @@ public class Climber extends SubsystemBase {
     }
   }
 
-  public boolean getUpFlag() {
-    return upFlag;
+  public void requestToggle() {
+    if (!upFlag) {
+      climberUp();
+      upFlag = true;
+    } else {
+      climberDown();
+      upFlag = false;
+    }
   }
 
   @Override

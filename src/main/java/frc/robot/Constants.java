@@ -4,12 +4,16 @@ public final class Constants {
     public static final class GamepadButtons {
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
-		    public static int JOYSTICK_DRIVE = 6;
+		public static int JOYSTICK_DRIVE = 6;
         
         // misc. buttons
         public static int SHOOTER = 1;
         public static int CLIMBER_BUTTON = 4;
         public static int GRIP_BUTTON = 7;
+
+        // Joy buttons
+        public static int FIRE_SHOOTER = 1;
+        public static int LIMEY_TOGGLE = 7;
     }
 
     public static final class DriveConstants {
