@@ -69,7 +69,7 @@ public final class Constants {
         public static double WHEEL_DIAMETER_FT = 0.5; // 6 inches, unit of variable is feet
         public static double REVOLUTION_P_FT = 1 / WHEEL_DIAMETER_FT * Math.PI;
       
-        public static double HALF_TURN = 3748;
+        public static double HALF_TURN = 3748; // revolutions
         public static double TARGET_DISTANCE_FT = 8.46; // the distance from the field to the bottom of the vision tape 8.46
       
         public static double SPEED = 0.6;

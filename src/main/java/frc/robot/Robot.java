@@ -63,9 +63,13 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     RobotContainer.driveSubsystem.encoderDrive();
     if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
-      // insert 180 degrees code
-      RobotContainer.driveSubsystem.trackObject();
-      RobotContainer.shooter.requestToggle();
+      // INTAKE CODE! --> while its moving
+      RobotContainer.driveSubsystem.halfTurn();
+      if(RobotContainer.driveSubsystem.avgRevolutionsTracked >= Constants.EncoderConstants.HALF_TURN) {
+        RobotContainer.driveSubsystem.trackObject();
+        RobotContainer.driveSubsystem.stop();
+        RobotContainer.shooter.requestToggle();
+      }
     }
   }
 
