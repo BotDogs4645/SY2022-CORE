@@ -11,9 +11,10 @@ public final class Constants {
         public static int CLIMBER_BUTTON = 4;
         public static int GRIP_BUTTON = 7;
 
-        // Joy buttons
+    }
+    public static final class JoystickButtons {
         public static int FIRE_SHOOTER = 1;
-        public static int LIMEY_TOGGLE = 7;
+        public static int LIMEY_TOGGLE = 3;
     }
 
     public static final class DriveConstants {

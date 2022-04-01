@@ -3,6 +3,7 @@ package frc.robot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,6 +28,7 @@ public class RobotContainer {
   // climber motors
   private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.ClimberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
   private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.ClimberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
+  private final AHRS ahrs = new AHRS();
 
   // indexer motors
   private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.VERTICAL_INDEXER_MOTOR);
@@ -46,8 +48,8 @@ public class RobotContainer {
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
 
   // joy buttons
-  public final JoystickButton shootBall = new JoystickButton(driveController, Constants.GamepadButtons.FIRE_SHOOTER);
-  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.GamepadButtons.LIMEY_TOGGLE);
+  public final JoystickButton shootBall = new JoystickButton(driveController, Constants.JoystickButtons.FIRE_SHOOTER);
+  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
 
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
@@ -55,7 +57,7 @@ public class RobotContainer {
   // subsystems
   public static final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
   public final ShooterIntegratedPID shooterSubsystem = new ShooterIntegratedPID(shooterMotor, shooterMotor2, verticalIndexerMotor, horizontalIndexerMotor);
-  public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController);
+  public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController, ahrs);
   
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
@@ -76,7 +78,7 @@ public class RobotContainer {
     shootBall.whenReleased(new InstantCommand(shooterSubsystem::toggleOff, shooterSubsystem));
     shootBall.whileHeld(new InstantCommand(shooterSubsystem::indexCargo, shooterSubsystem));
 
-    climbButton.whenPressed(new InstantCommand(climberSubsystem::requestToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
+    climbButton.whenPressed(new InstantCommand(climberSubsystem::climberToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
   }
 }

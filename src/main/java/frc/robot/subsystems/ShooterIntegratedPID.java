@@ -143,11 +143,11 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public double getDistanceFromHub() {
     double yOffset = ty.getDouble(0.0);
     double radians = Math.toRadians(yOffset);
-    //In footsies vv
+    //In inchies vv
     double limeDistance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
+    double hypotenuse = (Math.sqrt((Math.pow(limeDistance, 2) + Math.pow((Constants.gameConstants.LOW_GOAL_HEIGHT - Constants.limelightConstants.LIMELIGHT_HEIGHT), 2))));
     //Ball exit distance as a funtion of limelight distance; converts from feet to m and returns m
-    double exitDistanceMeters = Math.pow((Math.pow((Math.pow((limeDistance * .3048), 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
-
+    double exitDistanceMeters = Math.pow((Math.pow((Math.pow((hypotenuse * .3048), 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
     double exitDistanceFeet = exitDistanceMeters * 3.28084; //back to footsies
 
     return exitDistanceFeet;
