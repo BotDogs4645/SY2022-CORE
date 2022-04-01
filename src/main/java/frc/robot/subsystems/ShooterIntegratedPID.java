@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 
 public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX _talon;
@@ -32,7 +30,6 @@ public class ShooterIntegratedPID extends SubsystemBase {
   NetworkTableEntry limeMode = table.getEntry("ledMode");
 
   private boolean limeOn = false;
-  private boolean enabled = false;
   private boolean limelightModeEnabled = false;
   private double avg_error = 0;
   private int countee = 0;
@@ -48,7 +45,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
     _talon.setNeutralMode(NeutralMode.Brake);
     _talon.set(TalonFXControlMode.Velocity, 0);
     _talon.setInverted(true);
-    _talon.configNeutralDeadband(0); // 25
+    _talon.configNeutralDeadband(0.04); // 25
     _talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
 
     _talon.configNominalOutputForward(0, Constants.IntegratedShooterPID.timeoutMS);
@@ -82,7 +79,22 @@ public class ShooterIntegratedPID extends SubsystemBase {
 	  _talon2.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
     _talon2.getSensorCollection().setIntegratedSensorPosition(0, 30);
     SmartDashboard.putNumber("setpoint@shooter", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
-}
+  }
+
+  /*
+    A basic run down of the Shooter subsystem:
+    1. Limelight
+      a. Limelight is to be enabled with a button press (Currently button 7 on the side of the joystick)
+      b. Shooting w/o limelight is not recommended but can be done if its manually disabled.
+      c. The limelight has to be initally aimed somewhere near the tape of the upper hub to begin to orient to it.
+      d. When the chassis is aimed and aligned to the hub: the down, hold and release methods will be enabled on the trigger
+    2. The down, hold and release methods
+      a. whenPressed - activates and runs the flywheels to a specific setpoint after the limelight mode is enabled, constantly calculating
+        distance to translate to RPM for shooting. 
+      b. whenReleased - deactivates the the flywheels and stops indexing the cargo.
+      c. whenHeld - Constantly checks the boolean for the cooldown. If the cooldown is over, then the indexer belts move the ball to the
+        shooter.
+  */
 
   @Override
   public void periodic() {
@@ -116,14 +128,15 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
         Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT = RPMConversion + 200;
         Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT = RPMConversion;
-        
+
+
         SmartDashboard.putNumber("exitVeloReq@", exitVelocity);
         SmartDashboard.putNumber("distanceFromHub@", distance);
-      } else {
-        limeOn = false;
-        limeMode.setDouble(1.0);
-        DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
-      }
+      } 
+    } else {
+      limeOn = false;
+      limeMode.setDouble(1.0);
+      DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
     }
   }
 
@@ -139,20 +152,34 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
     return exitDistanceFeet;
   }
-  
-  public void requestToggle() {
-    enabled = !enabled;
-    if (enabled) {
-      countee = 0;
-      avg_error = 0;
+
+  public void continuousIndexCheck() {
+    if(shooterCooldown()) {
       indexCargo();
-      _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-      _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+      lastShotTime = Timer.getFPGATimestamp();
     } else {
       stopCargo();
-      _talon.set(TalonFXControlMode.Disabled, 0);
-      _talon2.set(TalonFXControlMode.Disabled, 0);
     }
+  }
+  
+  public void toggleOn() {
+    countee = 0;
+    avg_error = 0;
+    
+    if (shooterCooldown()) {
+      indexCargo();
+      lastShotTime = Timer.getFPGATimestamp();
+    }
+
+    _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+    _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+
+  }
+
+  public void toggleOff() {
+    stopCargo();
+    _talon.set(TalonFXControlMode.Disabled, 0);
+    _talon2.set(TalonFXControlMode.Disabled, 0);
   }
 
   public void limeyToggle() {

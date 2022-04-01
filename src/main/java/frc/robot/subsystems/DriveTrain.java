@@ -44,7 +44,7 @@ public class DriveTrain extends SubsystemBase {
 
   private double rawEncoderOutLeft;
   private double rawEncoderOutRight; 
-  public static double averageDisplacement;
+  public double averageDisplacement;
 
   private GripPipeline pipe;
   private VisionThread VisionThread;

@@ -68,10 +68,13 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
-
+  
   private void configureButtonBindings() {
     enableLimey.whenPressed(new InstantCommand(shooterSubsystem::limeyToggle, shooterSubsystem)); // Requests the opposite mode, to disable or reenable.
-    shootBall.whenPressed(new InstantCommand(shooterSubsystem::requestToggle, shooterSubsystem)); // Requests the opposite mode, to disable or reenable.
+
+    shootBall.whenPressed(new InstantCommand(shooterSubsystem::toggleOn, shooterSubsystem)); // Toggle on while button is held
+    shootBall.whenReleased(new InstantCommand(shooterSubsystem::toggleOff, shooterSubsystem));
+    shootBall.whileHeld(new InstantCommand(shooterSubsystem::indexCargo, shooterSubsystem));
 
     climbButton.whenPressed(new InstantCommand(climberSubsystem::requestToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder
