@@ -48,8 +48,13 @@ public class RobotContainer {
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
 
   // joy buttons
+<<<<<<< Updated upstream
   public final JoystickButton shootBall = new JoystickButton(driveController, Constants.JoystickButtons.FIRE_SHOOTER);
   public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
+=======
+  public final JoystickButton shootBall = new JoystickButton(driveController, Constants.GamepadButtons.FIRE_SHOOTER);
+  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.GamepadButtons.LIMEY_TOGGLE); 
+>>>>>>> Stashed changes
 
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
@@ -74,9 +79,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     enableLimey.whenPressed(new InstantCommand(shooterSubsystem::limeyToggle, shooterSubsystem)); // Requests the opposite mode, to disable or reenable.
 
-    shootBall.whenPressed(new InstantCommand(shooterSubsystem::toggleOn, shooterSubsystem)); // Toggle on while button is held
-    shootBall.whenReleased(new InstantCommand(shooterSubsystem::toggleOff, shooterSubsystem));
-    shootBall.whileHeld(new InstantCommand(shooterSubsystem::indexCargo, shooterSubsystem));
+    // shootBall.whenPressed(new InstantCommand(shooterSubsystem::toggleOn, shooterSubsystem)); // Toggle on while button is held
+    // shootBall.whenReleased(new InstantCommand(shooterSubsystem::toggleOff, shooterSubsystem));
+    // shootBall.whileHeld(new InstantCommand(shooterSubsystem::indexCargo, shooterSubsystem));
+
+
+
 
     climbButton.whenPressed(new InstantCommand(climberSubsystem::climberToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
     encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.GamepadButtons.ENCODER_DRIVE)); // change drive mode to encoder

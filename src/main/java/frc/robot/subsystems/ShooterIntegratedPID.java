@@ -1,8 +1,13 @@
 package frc.robot.subsystems;
 
+import javax.swing.text.html.HTMLDocument.BlockElement;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -14,8 +19,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ShooterIntegratedPID extends SubsystemBase {
-  private WPI_TalonFX _talon;
-  private WPI_TalonFX _talon2;
+  private WPI_TalonFX shootie;
+  private WPI_TalonFX loadie;
 
   private WPI_TalonFX vertical;
   private WPI_TalonFX horizontal;
@@ -30,8 +35,10 @@ public class ShooterIntegratedPID extends SubsystemBase {
   NetworkTableEntry limeMode = table.getEntry("ledMode");
 
   private boolean limeOn = false;
+  public boolean isAtSetpoint = false;
   private boolean limelightModeEnabled = false;
   private double avg_error = 0;
+  private int setPointCount = 0;
   private int countee = 0;
 
   private static double lastShotTime = Integer.MAX_VALUE;
@@ -40,45 +47,50 @@ public class ShooterIntegratedPID extends SubsystemBase {
     this.vertical = vertical;
     this.horizontal = horizontal;
 
-    this._talon = shootie;
-    _talon.configFactoryDefault();
-    _talon.setNeutralMode(NeutralMode.Brake);
-    _talon.set(TalonFXControlMode.Velocity, 0);
-    _talon.setInverted(true);
-    _talon.configNeutralDeadband(0.04); // 25
-    _talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
+    this.shootie = shootie;
+    shootie.configFactoryDefault();
+    this.loadie = loadie;
+    loadie.configFactoryDefault();
+    
+    TalonFXConfiguration _rightConfig = new TalonFXConfiguration();
+    
+    shootie.set(TalonFXControlMode.PercentOutput, 0);
+    loadie.set(TalonFXControlMode.PercentOutput, 0);
 
-    _talon.configNominalOutputForward(0, Constants.IntegratedShooterPID.timeoutMS);
-		_talon.configNominalOutputReverse(0, Constants.IntegratedShooterPID.timeoutMS);
-    _talon.configPeakOutputForward(1, Constants.IntegratedShooterPID.timeoutMS);
-		_talon.configPeakOutputReverse(-1,  Constants.IntegratedShooterPID.timeoutMS);
+    shootie.setNeutralMode(NeutralMode.Brake);
+    loadie.setNeutralMode(NeutralMode.Brake);
 
-    _talon.config_kF(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kF, Constants.IntegratedShooterPID.timeoutMS);
-		_talon.config_kP(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kP, Constants.IntegratedShooterPID.timeoutMS);
-		_talon.config_kI(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kI, Constants.IntegratedShooterPID.timeoutMS);
-		_talon.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
-    _talon.getSensorCollection().setIntegratedSensorPosition(0, 30);
+    shootie.follow(loadie);
 
-    // Aidan was here
-    //Loadie PID
-    _talon2 = loadie;
-    _talon2.configFactoryDefault();
-    _talon2.setNeutralMode(NeutralMode.Brake);
-    _talon2.set(TalonFXControlMode.Velocity, 0);
-    _talon2.configNeutralDeadband(0); // 25
-    _talon2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.timeoutMS);
+    shootie.setInverted(TalonFXInvertType.CounterClockwise);
+    loadie.setInverted(TalonFXInvertType.Clockwise);
 
-    _talon2.configNominalOutputForward(0, Constants.IntegratedShooterPID.timeoutMS);
-	  _talon2.configNominalOutputReverse(0, Constants.IntegratedShooterPID.timeoutMS);
-    _talon2.configPeakOutputForward(1, Constants.IntegratedShooterPID.timeoutMS);
-	  _talon2.configPeakOutputReverse(-1,  Constants.IntegratedShooterPID.timeoutMS);
+    _rightConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
 
-    _talon2.config_kF(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kF, Constants.IntegratedShooterPID.timeoutMS);
-	  _talon2.config_kP(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kP, Constants.IntegratedShooterPID.timeoutMS);
-	  _talon2.config_kI(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kI, Constants.IntegratedShooterPID.timeoutMS);
-	  _talon2.config_kD(Constants.IntegratedShooterPID.PID_LOOP_ID, Constants.IntegratedShooterPID.kD, Constants.IntegratedShooterPID.timeoutMS);
-    _talon2.getSensorCollection().setIntegratedSensorPosition(0, 30);
-    SmartDashboard.putNumber("setpoint@shooter", Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT);
+    _rightConfig.slot0.kF = Constants.IntegratedShooterPID.kF;
+    _rightConfig.slot0.kP = Constants.IntegratedShooterPID.kP;
+    _rightConfig.slot0.kI = Constants.IntegratedShooterPID.kI;
+    _rightConfig.slot0.kD = Constants.IntegratedShooterPID.kD;
+    _rightConfig.slot0.integralZone = Constants.IntegratedShooterPID.kIZone;
+    _rightConfig.slot0.closedLoopPeakOutput = Constants.IntegratedShooterPID.peakOut;
+
+    _rightConfig.neutralDeadband = 0.001;
+
+    int closedLoopTimeMs = 1;
+
+    _rightConfig.slot0.closedLoopPeriod = closedLoopTimeMs;
+    _rightConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
+    _rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
+    _rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
+
+
+    loadie.configAllSettings(_rightConfig);
+
+    shootie.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255, Constants.IntegratedShooterPID.timeoutMS);
+    shootie.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255, Constants.IntegratedShooterPID.timeoutMS);
+
+    Constants.IntegratedShooterPID.RPM_SETPOINT = 0.0;
+
   }
 
   /*
@@ -99,11 +111,11 @@ public class ShooterIntegratedPID extends SubsystemBase {
   @Override
   public void periodic() {
     if (limelightModeEnabled) {
-      SmartDashboard.putNumber("shootie@errorRPM:", _talon.getClosedLoopError(0));
-      SmartDashboard.putNumber("shootie@target:", _talon.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID) / Constants.IntegratedShooterPID.CONVERSION_RATE);
-      SmartDashboard.putNumber("shootie@currentRPM:", _talon.getSelectedSensorVelocity(1) * (2048.0 / 6000.0));
-      SmartDashboard.putNumber("loadie@currentRPM:", _talon2.getSelectedSensorVelocity(1) * (2048.0 / 6000.0));
-      avg_error += _talon.getClosedLoopError();
+      SmartDashboard.putNumber("shootie@errorRPM:", shootie.getClosedLoopError(0));
+      SmartDashboard.putNumber("shootie@target:", loadie.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID) / Constants.IntegratedShooterPID.CONVERSION_RATE);
+      SmartDashboard.putNumber("shootie@currentRPM:", shootie.getSelectedSensorVelocity(1) * (2048.0 / 6000.0));
+      SmartDashboard.putNumber("loadie@currentRPM:", loadie.getSelectedSensorVelocity(1) * (2048.0 / 6000.0));
+      avg_error += loadie.getClosedLoopError();
       countee++;
       SmartDashboard.putNumber("shootie@avgErr:", avg_error / countee);
 
@@ -126,8 +138,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
         RPMConversion = Math.pow(exitVelocity / .703595, 3.57002606);
 
-        Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT = RPMConversion + 200;
-        Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT = RPMConversion;
+        Constants.IntegratedShooterPID.RPM_SETPOINT = RPMConversion + 200;
 
 
         SmartDashboard.putNumber("exitVeloReq@", exitVelocity);
@@ -138,6 +149,22 @@ public class ShooterIntegratedPID extends SubsystemBase {
       limeMode.setDouble(1.0);
       DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
     }
+  }
+
+  public boolean isAtSetpoint() {
+    if(Math.abs(this.getVelocity() - Constants.IntegratedShooterPID.RPM_SETPOINT) < 300) {
+      setPointCount++;
+      if(setPointCount >= 20) {
+          return true;
+      }
+    } else {
+        setPointCount = 0;
+    }
+    return false;
+  }
+
+  public double getVelocity() {
+    return loadie.getSelectedSensorVelocity(0);   
   }
 
   public double getDistanceFromHub() {
@@ -154,9 +181,8 @@ public class ShooterIntegratedPID extends SubsystemBase {
   }
 
   public void continuousIndexCheck() {
-    if(shooterCooldown()) {
-      indexCargo();
-      lastShotTime = Timer.getFPGATimestamp();
+    if(isAtSetpoint()) {
+      upperBeltIndex();
     } else {
       stopCargo();
     }
@@ -166,28 +192,29 @@ public class ShooterIntegratedPID extends SubsystemBase {
     countee = 0;
     avg_error = 0;
     
-    if (shooterCooldown()) {
-      indexCargo();
+    if (isAtSetpoint()) {
+      upperBeltIndex();
       lastShotTime = Timer.getFPGATimestamp();
     }
 
-    _talon.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.SHOOTIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-    _talon2.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.LOADIE_RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-
+    loadie.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
   }
 
   public void toggleOff() {
     stopCargo();
-    _talon.set(TalonFXControlMode.Disabled, 0);
-    _talon2.set(TalonFXControlMode.Disabled, 0);
+    shootie.set(TalonFXControlMode.Disabled, 0);
+    loadie.set(TalonFXControlMode.Disabled, 0);
   }
 
   public void limeyToggle() {
     limelightModeEnabled = !limelightModeEnabled;
   }
 
-  public void indexCargo() {
+  public void lowerBeltIndex() {
     vertical.set(speed);
+  }
+
+  public void upperBeltIndex() {
     horizontal.set(speed);
   }
 
@@ -201,10 +228,4 @@ public class ShooterIntegratedPID extends SubsystemBase {
     horizontal.set(-speed);
   }
 
-  public static boolean shooterCooldown() {
-    if (Timer.getFPGATimestamp() - lastShotTime > 2/3 && Timer.getFPGATimestamp() > 2/3) {
-      return true;
-    }
-    return false;
-  }
 }
