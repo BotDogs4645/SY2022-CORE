@@ -7,10 +7,13 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import frc.robot.commands.Drive;
 import frc.robot.commands.LimelightAlignToLower;
@@ -18,6 +21,7 @@ import frc.robot.commands.ToClosestPlottedPosition;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.LimelightMath;
+import frc.robot.commands.AutoProfile1;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.subsystems.ShooterIntegratedPID;
 
@@ -34,9 +38,11 @@ public class RobotContainer {
   private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.ClimberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
   private final AHRS ahrs = new AHRS();
 
+ 
+
   // indexer motors
-  private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.VERTICAL_INDEXER_MOTOR);
-  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.HORIZONTAL_INDEXER_MOTOR);
+  private final static WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.VERTICAL_INDEXER_MOTOR);
+  private final static WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.HORIZONTAL_INDEXER_MOTOR);
   
   // tank drive motor groups
   private final static MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
@@ -59,12 +65,12 @@ public class RobotContainer {
   // joy buttons
   public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
 
-  public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
-  public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
+  public final static WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
+  public final static WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
  
   // subsystems
   public static final DriveTrain driveSubsystem = new DriveTrain(leftMotors, rightMotors, driveController, upperLeftMotor, upperRightMotor);
-  public final ShooterIntegratedPID shooterSubsystem = new ShooterIntegratedPID(shooterMotor, shooterMotor2, verticalIndexerMotor, horizontalIndexerMotor);
+  public static final ShooterIntegratedPID shooterSubsystem = new ShooterIntegratedPID(shooterMotor, shooterMotor2, verticalIndexerMotor, horizontalIndexerMotor);
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController, ahrs);
   public static LimelightMath LimeMath = new LimelightMath();
   
@@ -72,6 +78,7 @@ public class RobotContainer {
   public final Drive driveCommand = new Drive(driveSubsystem);
   public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.DriveConstants.JOYSTICK_DRIVE); // default drive mode is manual joystick
 
+  public SendableChooser<Command> chooser = new SendableChooser<>();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     leftMotors.setInverted(true);
@@ -85,16 +92,15 @@ public class RobotContainer {
       new SequentialCommandGroup(
         new InstantCommand(shooterSubsystem::limeOn, shooterSubsystem),
         new LimelightAlignToLower(driveSubsystem),
-        new ToClosestPlottedPosition(driveSubsystem)
-      )); // Enables limey, then aligns to lower, once aligned to lower it then moves to the closest plotted position to have precise RPM control.
+        new ToClosestPlottedPosition(driveSubsystem))
+      ); 
+      chooser.addOption("Main", new InstantCommand());
+      chooser.addOption("Auto 1", new AutoProfile1(driveSubsystem, shooterSubsystem));
 
-    // shootBall.whenPressed(new InstantCommand(shooterSubsystem::toggleOn, shooterSubsystem)); // Toggle on while button is held
-    // shootBall.whenReleased(new InstantCommand(shooterSubsystem::toggleOff, shooterSubsystem));
-    // shootBall.whileHeld(new InstantCommand(shooterSubsystem::indexCargo, shooterSubsystem));
-
-    
-
-    // climbButton.whenPressed(new InstantCommand(climberSubsystem::climberToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
-    // encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveConstants.ENCODER_DRIVE)); // change drive mode to encoder
+      // chooser.addOption("auto1",);
+      Shuffleboard.getTab("Main").add("Auto Command", chooser);
+  }
+  public Command getAutoCommand() {
+    return chooser.getSelected();
   }
 }
