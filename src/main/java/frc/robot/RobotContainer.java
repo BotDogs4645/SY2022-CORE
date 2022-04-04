@@ -15,6 +15,7 @@ import frc.robot.commands.Drive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.commands.Absorb;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.subsystems.ShooterIntegratedPID;
 
@@ -47,6 +48,7 @@ public class RobotContainer {
   public final JoystickButton alignButton = new JoystickButton(buttonController, Constants.DriveModes.LIMELIGHT_DRIVE);
   public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON);
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
+  public final JoystickButton deathButton = new JoystickButton(driveController, 5);
 
   public final static WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
   public final static WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);
@@ -73,5 +75,6 @@ public class RobotContainer {
     shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
     climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     alignButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveModes.LIMELIGHT_DRIVE));
+    deathButton.whenPressed(new Absorb());
   }
 }

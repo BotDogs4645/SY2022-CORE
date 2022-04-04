@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -61,6 +63,8 @@ public class DriveTrain extends SubsystemBase {
   private final DifferentialDrive differentialDriveSub;
   private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
   
+  private CANSparkMax absorb = new CANSparkMax(3, MotorType.kBrushed);
+
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
     driveMode = Constants.DriveModes.JOYSTICK_DRIVE;
@@ -174,5 +178,9 @@ public class DriveTrain extends SubsystemBase {
       }
       differentialDriveSub.tankDrive(finalRot, -finalRot);
     }
+  }
+
+  public void absorb() {
+    absorb.set(-0.6);
   }
 }

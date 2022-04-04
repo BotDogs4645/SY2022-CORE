@@ -27,7 +27,7 @@ public final class Constants {
         public static final int BUTTON_CONTROLLER = 1;
 
         // max output
-        public static final double MAX_OUTPUT = 0.75;
+        public static final double MAX_OUTPUT = 0.60;
         
         // limelight tracking constants
         public static final double MIN_ROT_SPEED = .15;
