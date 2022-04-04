@@ -48,13 +48,8 @@ public class RobotContainer {
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
 
   // joy buttons
-<<<<<<< Updated upstream
   public final JoystickButton shootBall = new JoystickButton(driveController, Constants.JoystickButtons.FIRE_SHOOTER);
-  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
-=======
-  public final JoystickButton shootBall = new JoystickButton(driveController, Constants.GamepadButtons.FIRE_SHOOTER);
-  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.GamepadButtons.LIMEY_TOGGLE); 
->>>>>>> Stashed changes
+  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE); 
 
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
   public final WPI_TalonFX shooterMotor2 = new WPI_TalonFX(Constants.IntegratedShooterPID.LOADIE_ID);

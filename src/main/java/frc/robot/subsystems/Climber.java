@@ -24,6 +24,8 @@ public class Climber extends SubsystemBase {
     this.buttonController = buttonController;
     this.ahrs = ahrs;
   }
+
+  // method below is probably not needed, b/c the climbers are only long enough to extend to mid.
   public double calculateDistance() {
     distance = ahrs.getVelocityY() * ((Timer.getFPGATimestamp() - climbStartTime) / 1000);
     return distance;
@@ -41,31 +43,22 @@ public class Climber extends SubsystemBase {
     }
   }
 
-  // public void climberDown() {
-  //   rightClimberMotor.set(-0.5);
-  //   leftClimberMotor.set(-0.5);
-  //   if (calculateDistance() > 1.53) {
-  //     rightClimberMotor.set(0);
-  //     leftClimberMotor.set(0);
-  //     upFlag = false;
-  //   }
-  // }
-
   public void climberUp() {
     rightClimberMotor.set(0);
     leftClimberMotor.set(0);
     upFlag = true;
   }
-  
+  // applies more torque & motor power than climberDown to lift the robot
   public void latch() {
     if(upFlag) {
-      rightClimberMotor.set(0.5);
-      leftClimberMotor.set(0.5);
+      rightClimberMotor.set(0.7);
+      leftClimberMotor.set(0.7);
     }
   }
-
-  public boolean getUpFlag() {
-    return upFlag;
+  //brings the arm down slowly and keeps it set
+  public void climberDown() {
+    rightClimberMotor.set(0.25);
+    leftClimberMotor.set(0.25);
   }
 
   @Override
