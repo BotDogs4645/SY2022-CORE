@@ -62,7 +62,7 @@ public class DriveTrain extends SubsystemBase {
   public boolean resetHalfTurn = true;
   public double avgRevolutionsTracked;
 
-  public boolean testingMode = false;
+  public boolean testingMode = true;
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
   NetworkTableEntry tx = table.getEntry("tx");
@@ -268,8 +268,5 @@ public class DriveTrain extends SubsystemBase {
     }
     stop();
     return false;
-  }
-  public void absorb() {
-    
   }
 }

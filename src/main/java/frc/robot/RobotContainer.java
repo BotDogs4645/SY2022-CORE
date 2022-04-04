@@ -98,7 +98,7 @@ public class RobotContainer {
       chooser.addOption("Auto 1", new AutoProfile1(driveSubsystem, shooterSubsystem));
 
       // chooser.addOption("auto1",);
-      Shuffleboard.getTab("Main").add("Auto Command", chooser);
+      Shuffleboard.getTab("Main").add("Auto Command", chooser).withPosition(1, 1);
   }
   public Command getAutoCommand() {
     return chooser.getSelected();
