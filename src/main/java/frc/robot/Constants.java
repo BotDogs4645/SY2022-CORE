@@ -46,6 +46,7 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
+        public static double LIMELIGHT_ANGLE = 30;
         public static double LIMELIGHT_ROTATION_F = .2;
         public static double LIMELIGHT_ROTATION_P = .12;
         public static double LIMELIGHT_ROTATION_I = 0;

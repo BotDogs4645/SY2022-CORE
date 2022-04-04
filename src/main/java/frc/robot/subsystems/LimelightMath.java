@@ -76,15 +76,10 @@ public class LimelightMath extends SubsystemBase {
     public double getDistanceFromHub() {
         this.ty = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("ty").getDouble(0.0);
         this.tx = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("tx").getDouble(0.0);
-        double radians = Math.toRadians(ty);
+        double radians = Math.toRadians(ty) + Math.toRadians(LimelightConstants.LIMELIGHT_ANGLE);
         //In inchies vv
-        double limeDistance = ((Constants.LimelightConstants.LIMELIGHT_HEIGHT - Constants.GameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
-        double hypotenuse = (Math.sqrt((Math.pow(limeDistance, 2) + Math.pow((Constants.GameConstants.LOW_GOAL_HEIGHT - Constants.LimelightConstants.LIMELIGHT_HEIGHT), 2))));
-        // // Ball exit distance as a funtion of limelight distance; converts from feet to m and returns m
-        // double exitDistanceMeters = Math.pow((Math.pow((Math.pow((hypotenuse * .3048), 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
-        // double exitDistanceFeet = exitDistanceMeters * 3.28084; //back to footsies
-    
-        // Only return hypotenuse, because it is the distance from the Limelight camera to the lower hub tape.
+        double hypotenuse = ((Constants.GameConstants.HIGH_GOAL_HEIGHT - Constants.LimelightConstants.LIMELIGHT_HEIGHT) / Math.sin(radians)) / 12; // in feet
+
         return hypotenuse;
     }
 
