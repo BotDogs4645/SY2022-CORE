@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
@@ -10,6 +12,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -18,10 +21,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.GripPipeline;
+import frc.robot.RobotContainer;
 
 public class DriveTrain extends SubsystemBase {
   public static int driveMode;
@@ -48,8 +54,12 @@ public class DriveTrain extends SubsystemBase {
 
   private GripPipeline pipe;
   private VisionThread VisionThread;
-  public static boolean alignedToHub;
+  public static boolean alignedToHub = false;
+  public static boolean inPreferredPosition = false;
   private Object foundTarget = new Object();
+  public LimelightMath LimeMath;
+
+  public boolean testingMode = false;
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
   NetworkTableEntry tx = table.getEntry("tx");
@@ -63,7 +73,8 @@ public class DriveTrain extends SubsystemBase {
   
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
-    driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
+    driveMode = Constants.DriveConstants.JOYSTICK_DRIVE;
+    LimeMath = RobotContainer.LimeMath;
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
@@ -79,6 +90,33 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.setMaxOutput(Constants.DriveConstants.MAX_OUTPUT);
 
     ahrs.reset();
+
+    if (testingMode) {
+      Shuffleboard.getTab("DriveTrain")
+          .add("Rotation FF", 0.0)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            Constants.LimelightConstants.LIMELIGHT_ROTATION_F = event.getEntry().getValue().getDouble();
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      Shuffleboard.getTab("DriveTrain")
+          .add("Forward FF", 0.0)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            Constants.LimelightConstants.LIMELIGHT_FOW_F = event.getEntry().getValue().getDouble();
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      Shuffleboard.getTab("DriveTrain")
+          .add("Forward P", 0.0)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            Constants.LimelightConstants.LIMELIGHT_FOW_P = event.getEntry().getValue().getDouble();
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }
   }
    
   public void updateAverageDisplacement() {
@@ -130,23 +168,58 @@ public class DriveTrain extends SubsystemBase {
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
   }
 
-  public void trackObject() { // IN TANK DRIVE!
-    double xOffset = -tx.getDouble(0.0);
-    SmartDashboard.putNumber("xOffset", xOffset);
-    double finalRot = 0.0;
-
-    if (xOffset < 1.5) { // 1.5 represents 3/2 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
+  public void trackObject(double f, double rot) { // IN TANK DRIVE!
+    if (rot > 0) {
+      rot += Constants.LimelightConstants.LIMELIGHT_ROTATION_F;
     }
-    else if (xOffset > 1.5) {   // dampens the rotation at the end while turning
-      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
+    else if (rot < 0) {
+      rot -= Constants.LimelightConstants.LIMELIGHT_ROTATION_F;
     }
 
-    if (Math.abs(xOffset) < 3) {
+    if (Math.abs(LimeMath.tx) < .8) {
       alignedToHub = true;
+    } else {
+      alignedToHub = false;
     }
 
-    differentialDriveSub.tankDrive(finalRot, -finalRot);
+    differentialDriveSub.arcadeDrive(0, rot);
+  }
+
+  public boolean isAligned() {
+    return alignedToHub;
+  }
+
+  public boolean isRepositioned() {
+    return inPreferredPosition;
+  }
+
+  public double getLimeX() {
+    return LimeMath.tx;
+  }
+
+  public void repositionBot(double f, double rot) {
+    // Assumes bot is aligned, meaning that we only need to manipulate the bot's direction in the Y direction.
+    double closestDistance = LimeMath.getClosestRelatedDistance(true);
+    // if closestdisance is less than the distance, it means we go forward, opposite -> backward
+    if (closestDistance < LimeMath.getDistanceFromHub()) {
+      differentialDriveSub.arcadeDrive(f + Constants.LimelightConstants.LIMELIGHT_FOW_F, 0);
+    } else {
+      differentialDriveSub.arcadeDrive(f - Constants.LimelightConstants.LIMELIGHT_FOW_F, 0);
+    }
+
+    if (Math.abs(closestDistance - LimeMath.getDistanceFromHub()) < 5) {
+      inPreferredPosition = true;
+    }  else {
+      inPreferredPosition = false;
+    }
+  }
+
+  public double getLimeDistanceToHub() {
+    return LimeMath.hypotenuse;
+  }
+
+  public double getClosestRelatedDistance() {
+    return LimeMath.getClosestRelatedDistance(true);
   }
 
   // grip declarations

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import javax.swing.text.html.HTMLDocument.BlockElement;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -10,13 +12,17 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX shootie;
@@ -33,10 +39,16 @@ public class ShooterIntegratedPID extends SubsystemBase {
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry limeMode = table.getEntry("ledMode");
+  LimelightMath LimeMath;
 
   private boolean limeOn = false;
   public boolean isAtSetpoint = false;
+
+  // MANUAL CONTROL
+  public boolean testingMode = false;
+
   private boolean limelightModeEnabled = false;
+  public boolean canShoot = false;
   private double avg_error = 0;
   private int setPointCount = 0;
   private int countee = 0;
@@ -46,14 +58,15 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie, WPI_TalonFX vertical, WPI_TalonFX horizontal) {
     this.vertical = vertical;
     this.horizontal = horizontal;
+    LimeMath = RobotContainer.LimeMath;
 
     this.shootie = shootie;
     shootie.configFactoryDefault();
     this.loadie = loadie;
     loadie.configFactoryDefault();
-    
+
     TalonFXConfiguration _rightConfig = new TalonFXConfiguration();
-    
+
     shootie.set(TalonFXControlMode.PercentOutput, 0);
     loadie.set(TalonFXControlMode.PercentOutput, 0);
 
@@ -83,122 +96,135 @@ public class ShooterIntegratedPID extends SubsystemBase {
     _rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
     _rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
 
-
     loadie.configAllSettings(_rightConfig);
 
     shootie.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255, Constants.IntegratedShooterPID.timeoutMS);
     shootie.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255, Constants.IntegratedShooterPID.timeoutMS);
 
     Constants.IntegratedShooterPID.RPM_SETPOINT = 0.0;
+    if (testingMode) {
+      Shuffleboard.getTab("Shooter")
+          .add("VelocitySetpoint", 0.0)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 6380)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            this.setVelocity(event.getEntry().getValue().getDouble());
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
+      Shuffleboard.getTab("Shooter")
+          .add("Flywheel Power", 0.0)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1.0)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            loadie.set(TalonFXControlMode.PercentOutput,
+                event.getEntry().getValue().getDouble());
+            shootie.set(TalonFXControlMode.PercentOutput,
+                event.getEntry().getValue().getDouble());
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      Shuffleboard.getTab("Shooter")
+          .add("Flywheel F", Constants.IntegratedShooterPID.kF)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1.0)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            this.loadie.config_kF(0, event.getEntry().getValue().getDouble(),
+                30);
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      Shuffleboard.getTab("Shooter")
+          .add("Flywheel P", Constants.IntegratedShooterPID.kP)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 2.0)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            this.loadie.config_kP(0, event.getEntry().getValue().getDouble(),
+                30);
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      Shuffleboard.getTab("Shooter")
+          .add("Flywheel I", Constants.IntegratedShooterPID.kI)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1.0)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            this.loadie.config_kI(0, event.getEntry().getValue().getDouble(),
+                30);
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      Shuffleboard.getTab("Shooter")
+          .add("Flywheel D", Constants.IntegratedShooterPID.kD)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", 0, "max", 1.0)) // specify widget properties here
+          .getEntry()
+          .addListener(event -> {
+            this.loadie.config_kD(0, event.getEntry().getValue().getDouble(),
+                30);
+          }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }
   }
 
-  /*
-    A basic run down of the Shooter subsystem:
-    1. Limelight
-      a. Limelight is to be enabled with a button press (Currently button 7 on the side of the joystick)
-      b. Shooting w/o limelight is not recommended but can be done if its manually disabled.
-      c. The limelight has to be initally aimed somewhere near the tape of the upper hub to begin to orient to it.
-      d. When the chassis is aimed and aligned to the hub: the down, hold and release methods will be enabled on the trigger
-    2. The down, hold and release methods
-      a. whenPressed - activates and runs the flywheels to a specific setpoint after the limelight mode is enabled, constantly calculating
-        distance to translate to RPM for shooting. 
-      b. whenReleased - deactivates the the flywheels and stops indexing the cargo.
-      c. whenHeld - Constantly checks the boolean for the cooldown. If the cooldown is over, then the indexer belts move the ball to the
-        shooter.
-  */
+  // being up at 1 am really sucks why did i wait to do this until now
 
   @Override
   public void periodic() {
-    if (limelightModeEnabled) {
+    if (limelightModeEnabled && !testingMode) {
       SmartDashboard.putNumber("shootie@errorRPM:", shootie.getClosedLoopError(0));
-      SmartDashboard.putNumber("shootie@target:", loadie.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID) / Constants.IntegratedShooterPID.CONVERSION_RATE);
-      SmartDashboard.putNumber("shootie@currentRPM:", shootie.getSelectedSensorVelocity(1) * (2048.0 / 6000.0));
-      SmartDashboard.putNumber("loadie@currentRPM:", loadie.getSelectedSensorVelocity(1) * (2048.0 / 6000.0));
+      SmartDashboard.putNumber("shootie@target:", loadie.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID)
+          / Constants.IntegratedShooterPID.CONVERSION_RATE);
+      SmartDashboard.putNumber("shootie@currentRPM:", shootie.getSelectedSensorVelocity() * (2048.0 / 6000.0));
+      SmartDashboard.putNumber("loadie@currentRPM:", loadie.getSelectedSensorVelocity() * (2048.0 / 6000.0));
       avg_error += loadie.getClosedLoopError();
       countee++;
       SmartDashboard.putNumber("shootie@avgErr:", avg_error / countee);
 
-      if (!limeOn) {
-        limeOn = true;
-        limeMode.setDouble(0.0);
-        DriveTrain.driveMode = Constants.GamepadButtons.LIMELIGHT_DRIVE;
-      }
-      // tracks object when limey is on
-
-      if (DriveTrain.alignedToHub) {
-        double distance = getDistanceFromHub();
-        double exitVelocity;
-        double RPMConversion;
-        if (distance < 11.811) {
-          exitVelocity = ((-0.00354 * Math.pow(distance, 2)) + (.348 * distance) + (2.38));
-        } else {
-          exitVelocity = ((.00107 * Math.pow(distance, 2)) + (.111 * distance) + (6.28));
+      // enables bot RPM when everything's good to go
+      if (DriveTrain.alignedToHub && DriveTrain.inPreferredPosition) {
+        double RPM = LimeMath.relateDistanceToRPM();
+        setVelocity(RPM);
+        if (isAtSetpoint()) {
+          canShoot = true;
         }
-
-        RPMConversion = Math.pow(exitVelocity / .703595, 3.57002606);
-
-        Constants.IntegratedShooterPID.RPM_SETPOINT = RPMConversion + 200;
-
-
-        SmartDashboard.putNumber("exitVeloReq@", exitVelocity);
-        SmartDashboard.putNumber("distanceFromHub@", distance);
-      } 
-    } else {
-      limeOn = false;
-      limeMode.setDouble(1.0);
-      DriveTrain.driveMode = Constants.GamepadButtons.JOYSTICK_DRIVE;
+      }
     }
   }
 
+
+
+  public void setVelocity(double rpm) {
+    Constants.IntegratedShooterPID.RPM_SETPOINT = rpm;
+    loadie.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+  }
+
   public boolean isAtSetpoint() {
-    if(Math.abs(this.getVelocity() - Constants.IntegratedShooterPID.RPM_SETPOINT) < 300) {
+    if (Math.abs(this.getVelocity() - Constants.IntegratedShooterPID.RPM_SETPOINT) < 300) {
       setPointCount++;
-      if(setPointCount >= 20) {
-          return true;
+      if (setPointCount >= 20) {
+        return true;
       }
     } else {
-        setPointCount = 0;
+      setPointCount = 0;
     }
     return false;
   }
 
   public double getVelocity() {
-    return loadie.getSelectedSensorVelocity(0);   
+    return loadie.getSelectedSensorVelocity(0);
   }
 
-  public double getDistanceFromHub() {
-    double yOffset = ty.getDouble(0.0);
-    double radians = Math.toRadians(yOffset);
-    //In inchies vv
-    double limeDistance = ((Constants.limelightConstants.LIMELIGHT_HEIGHT - Constants.gameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
-    double hypotenuse = (Math.sqrt((Math.pow(limeDistance, 2) + Math.pow((Constants.gameConstants.LOW_GOAL_HEIGHT - Constants.limelightConstants.LIMELIGHT_HEIGHT), 2))));
-    //Ball exit distance as a funtion of limelight distance; converts from feet to m and returns m
-    double exitDistanceMeters = Math.pow((Math.pow((Math.pow((hypotenuse * .3048), 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
-    double exitDistanceFeet = exitDistanceMeters * 3.28084; //back to footsies
+  // public void toggleOn() {
+  //   countee = 0;
+  //   avg_error = 0;
 
-    return exitDistanceFeet;
-  }
+  //   if (isAtSetpoint()) {
+  //     upperBeltIndex();
+  //     lastShotTime = Timer.getFPGATimestamp();
+  //   }
 
-  public void continuousIndexCheck() {
-    if(isAtSetpoint()) {
-      upperBeltIndex();
-    } else {
-      stopCargo();
-    }
-  }
-  
-  public void toggleOn() {
-    countee = 0;
-    avg_error = 0;
-    
-    if (isAtSetpoint()) {
-      upperBeltIndex();
-      lastShotTime = Timer.getFPGATimestamp();
-    }
-
-    loadie.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-  }
+  //   loadie.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
+  // }
 
   public void toggleOff() {
     stopCargo();
@@ -206,8 +232,14 @@ public class ShooterIntegratedPID extends SubsystemBase {
     loadie.set(TalonFXControlMode.Disabled, 0);
   }
 
-  public void limeyToggle() {
-    limelightModeEnabled = !limelightModeEnabled;
+  public void limeOn() {
+    limelightModeEnabled = true;
+    LimeMath.ledSetDefaultState();
+  }
+
+  public void limeOff() {
+    limelightModeEnabled = false;
+    LimeMath.ledOff();
   }
 
   public void lowerBeltIndex() {
@@ -215,7 +247,9 @@ public class ShooterIntegratedPID extends SubsystemBase {
   }
 
   public void upperBeltIndex() {
-    horizontal.set(speed);
+    if (canShoot || !limelightModeEnabled) {
+      horizontal.set(speed);
+    }
   }
 
   public void stopCargo() {

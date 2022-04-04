@@ -2,9 +2,6 @@ package frc.robot;
 
 public final class Constants {
     public static final class GamepadButtons {
-        public static int LIMELIGHT_DRIVE = 2;
-        public static int ENCODER_DRIVE = 3;
-		public static int JOYSTICK_DRIVE = 6;
         
         // misc. buttons
         public static int SHOOTER = 1;
@@ -36,13 +33,25 @@ public final class Constants {
         // limelight tracking constants
         public static final double MIN_ROT_SPEED = .15;
         public static final double ROT_MULTIPLIER = -0.05;
+        
+        // Drive Modes
+        public static int LIMELIGHT_DRIVE = 6;
+        public static int ENCODER_DRIVE = 2;
+		public static int JOYSTICK_DRIVE = 1;
     }
 
-    public static final class limelightConstants {
-        public static final double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
+    public static final class LimelightConstants {
+        public static double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
+        public static double LIMELIGHT_ROTATION_F = .2;
+        public static double LIMELIGHT_ROTATION_P = .12;
+        public static double LIMELIGHT_ROTATION_I = 0;
+        public static double LIMELIGHT_ROTATION_D = 0;
+        public static double LIMELIGHT_ROTATION_TOLERANCE = .8;
+        public static double LIMELIGHT_FOW_P = .1;
+        public static double LIMELIGHT_FOW_F = .2;
     }
 
-    public static final class gameConstants {
+    public static final class GameConstants {
         public static final double LOW_GOAL_HEIGHT = 57.5; //in inches
         public static final double HIGH_GOAL_HEIGHT = 104;
     } 
