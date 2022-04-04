@@ -48,7 +48,7 @@ public final class Constants {
 
     public static final class IntegratedShooterPID {
         public final static int SHOOTIE_ID = 13;
-        public final static int LOADIE_ID = 12;
+        public final static int LOADIE_ID = 12; // bottom shooter
 
         public static double SHOOTIE_RPM_SETPOINT = 6350.0; // 1560
         public static double LOADIE_RPM_SETPOINT = 6350.0;
@@ -83,8 +83,8 @@ public final class Constants {
     }
   
     public static final class ClimberConstants {
-        public static int RIGHT_CLIMBER_ID = 4; //PLACEHOLDERS
-        public static int LEFT_CLIMBER_ID = 5;
+        public static int RIGHT_CLIMBER_ID = 5;
+        public static int LEFT_CLIMBER_ID = 2;
 
         public static final double kP = 0.0080; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
         public static final double kI = 0.00092; // NOT USED
@@ -92,8 +92,8 @@ public final class Constants {
     }
   
     public static final class IndexerConstants {
-        public static int VERTICAL_INDEXER_MOTOR  = 6; //PLACEHOLDERS
-        public static int HORIZONTAL_INDEXER_MOTOR = 7;
-        public static final int INTAKE_MOTOR = 3; // intake
+        public static int VERTICAL_INDEXER_MOTOR  = 0; 
+        public static int HORIZONTAL_INDEXER_MOTOR = 1; // NEEDS TO BE UPDATED
+        public static final int INTAKE_MOTOR = 3; // intake; NEEDS TO BE UPDATED
     }
 }

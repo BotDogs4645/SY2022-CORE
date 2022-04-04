@@ -123,6 +123,8 @@ public class DriveTrain extends SubsystemBase {
     driveSpeed = driveController.getY();
     turnSpeed = driveController.getZ();
 
+    // set limit on speed, increase slew rate limiter, fix vertical intake button, make intake whileHeld() and reset them 
+
     driveSpeed = filterLeft.calculate(driveController.getY() * -1);
     turnSpeed = filterRight.calculate(driveController.getZ() * -1);
 

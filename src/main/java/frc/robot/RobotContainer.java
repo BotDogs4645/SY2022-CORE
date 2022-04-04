@@ -1,8 +1,7 @@
 package frc.robot;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,12 +26,12 @@ public class RobotContainer {
   private final static WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
-  private final CANSparkMax rightClimberMotor = new CANSparkMax(Constants.ClimberConstants.LEFT_CLIMBER_ID, MotorType.kBrushed);
-  private final CANSparkMax leftClimberMotor = new CANSparkMax(Constants.ClimberConstants.RIGHT_CLIMBER_ID, MotorType.kBrushed);
+  private final WPI_TalonSRX rightClimberMotor = new WPI_TalonSRX(Constants.ClimberConstants.LEFT_CLIMBER_ID);
+  private final WPI_TalonSRX leftClimberMotor = new WPI_TalonSRX(Constants.ClimberConstants.RIGHT_CLIMBER_ID);
 
   // indexer motors
   private final WPI_TalonFX verticalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.VERTICAL_INDEXER_MOTOR);
-  private final WPI_TalonFX horizontalIndexerMotor = new WPI_TalonFX(Constants.IndexerConstants.HORIZONTAL_INDEXER_MOTOR);
+  private final WPI_TalonSRX horizontalIndexerMotor = new WPI_TalonSRX(Constants.IndexerConstants.HORIZONTAL_INDEXER_MOTOR);
   
   // tank drive motor groups
   private final static MotorControllerGroup leftMotors = new MotorControllerGroup(upperLeftMotor, lowerLeftMotor);
@@ -66,22 +65,29 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    leftMotors.setInverted(true);
-    rightMotors.setInverted(false);
+    leftMotors.setInverted(false);
+    rightMotors.setInverted(true);
     driveSubsystem.setDefaultCommand(driveCommand);
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
-    shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
-    climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
+    //shooterButton.whenPressed(new InstantCommand(shooter::requestToggle, shooter)); // Requests the opposite mode, to disable or reenable.
+    //climbButton.whenPressed(new ConditionalCommand(new InstantCommand(climberSubsystem::climberUp), new InstantCommand(climberSubsystem::climberDown), climberSubsystem::getUpFlag));
     alignButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveModes.LIMELIGHT_DRIVE));
 
     // intake + indexer
     absorbButton.whileHeld(new InstantCommand(indexerSubsystem::absorb, indexerSubsystem));
     unabsorbButton.whileHeld(new InstantCommand(indexerSubsystem::unabsorb, indexerSubsystem));
 
-
-
+    /*
+    // make the trigger act like a climber button
+    if (buttonController.getLeftTriggerAxis() > 0.5) {
+      climberSubsystem.climberDown();
+    }
+    if (buttonController.getRightTriggerAxis() > 0.5) {
+      climberSubsystem.climberUp();
+    }
+    */
   }
 }

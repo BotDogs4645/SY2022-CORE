@@ -1,8 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -10,16 +11,17 @@ public class Climber extends SubsystemBase {
 
   private XboxController buttonController;
 
-  private CANSparkMax leftClimberMotor;
-  private CANSparkMax rightClimberMotor;
+  private WPI_TalonSRX leftClimberMotor;
+  private WPI_TalonSRX rightClimberMotor;
 
-  public Climber(CANSparkMax rightClimberMotor, CANSparkMax leftClimberMotor, XboxController buttonController) {
+  public Climber(WPI_TalonSRX rightClimberMotor, WPI_TalonSRX leftClimberMotor, XboxController buttonController) {
     this.leftClimberMotor = leftClimberMotor;
     this.rightClimberMotor = rightClimberMotor;
     this.buttonController = buttonController;
   }
 
   public void climberDown() {
+    SmartDashboard.putString("climber:", "down");
     rightClimberMotor.set(-0.5);
     leftClimberMotor.set(-0.5);
     if (rightClimberMotor.getBusVoltage() >= 30 && leftClimberMotor.getBusVoltage() >= 30) {
@@ -30,6 +32,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void climberUp() {
+    SmartDashboard.putString("climber:", "up");
     rightClimberMotor.set(0.5);
     leftClimberMotor.set(0.5);
     if (rightClimberMotor.getBusVoltage() >= 30 && leftClimberMotor.getBusVoltage() >= 30) {
