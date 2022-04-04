@@ -47,12 +47,16 @@ public class RobotContainer {
   public final XboxController buttonController  = new XboxController(Constants.DriveConstants.BUTTON_CONTROLLER); 
 
   // xbox buttons
-  public final JoystickButton encoderButton = new JoystickButton(buttonController, Constants.DriveConstants.LIMELIGHT_DRIVE); // pressing the button will ONLY enable driving with encoders. It will toggle itself off after running the comman
-  public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON);
+  public final JoystickButton climberUp = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_UP);
+  public final JoystickButton climberDown = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_DOWN);
   public final JoystickButton shooterButton = new JoystickButton(buttonController, Constants.GamepadButtons.SHOOTER);
+  public final JoystickButton lowerIntake = new JoystickButton(buttonController, Constants.GamepadButtons.LOWER_INTAKE);
+  public final JoystickButton reverseIndexers = new JoystickButton(buttonController, Constants.GamepadButtons.REVERSE_LOWER);
+  public final JoystickButton raiseIntake = new JoystickButton(buttonController, Constants.GamepadButtons.RAISE_INTAKE);
+  public final JoystickButton intakeAndIndex = new JoystickButton(buttonController, Constants.GamepadButtons.INTAKE);
+  public final JoystickButton topIndexer = new JoystickButton(buttonController, Constants.GamepadButtons.UPPER_BELTS);
 
   // joy buttons
-  public final JoystickButton shootBall = new JoystickButton(driveController, Constants.JoystickButtons.FIRE_SHOOTER);
   public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
 
   public final WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
@@ -88,8 +92,9 @@ public class RobotContainer {
     // shootBall.whenReleased(new InstantCommand(shooterSubsystem::toggleOff, shooterSubsystem));
     // shootBall.whileHeld(new InstantCommand(shooterSubsystem::indexCargo, shooterSubsystem));
 
+    
 
-    climbButton.whenPressed(new InstantCommand(climberSubsystem::climberToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
-    encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveConstants.ENCODER_DRIVE)); // change drive mode to encoder
+    // climbButton.whenPressed(new InstantCommand(climberSubsystem::climberToggle, climberSubsystem)); // Requests the opposite mode, to disable or reenable.
+    // encoderButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveConstants.ENCODER_DRIVE)); // change drive mode to encoder
   }
 }

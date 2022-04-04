@@ -4,14 +4,18 @@ public final class Constants {
     public static final class GamepadButtons {
         
         // misc. buttons
-        public static int SHOOTER = 1;
-        public static int CLIMBER_BUTTON = 4;
-        public static int GRIP_BUTTON = 7;
-
+        public static int REVERSE_LOWER = 1;
+        public static int LOWER_INTAKE = 2;
+        public static int SHOOTER = 3;
+        public static int RAISE_INTAKE = 4;
+        public static int UPPER_BELTS = 5;
+        public static int INTAKE = 6;
+        public static int CLIMBER_DOWN = 7;
+        public static int CLIMBER_UP = 8;
     }
+
     public static final class JoystickButtons {
-        public static int FIRE_SHOOTER = 1;
-        public static int LIMEY_TOGGLE = 3;
+        public static int LIMEY_TOGGLE = 7;
     }
 
     public static final class DriveConstants {
