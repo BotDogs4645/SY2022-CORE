@@ -48,6 +48,9 @@ public class DriveTrain extends SubsystemBase {
   private double rawEncoderOutRight; 
   public double averageDisplacement;
 
+  public boolean resetHalfTurn = true;
+  public double avgRevolutionsTracked;
+
   private GripPipeline pipe;
   private VisionThread VisionThread;
   public static boolean alignedToHub;
@@ -93,6 +96,31 @@ public class DriveTrain extends SubsystemBase {
     rightDistanceTraveled = rawEncoderOutRight / (Constants.EncoderConstants.k_UNITS_P_REVOLUTION * Constants.EncoderConstants.REVOLUTION_P_FT);
 
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
+  }
+
+  public void updateRevolutionsTracked() {
+    if (resetHalfTurn == true) {
+      resetEncoders();
+      resetHalfTurn = false;
+    }
+
+    rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition() / Constants.EncoderConstants.k_UNITS_P_REVOLUTION;
+    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1 / Constants.EncoderConstants.k_UNITS_P_REVOLUTION;
+    
+    avgRevolutionsTracked = (rawEncoderOutLeft + rawEncoderOutRight) / 2;
+  }
+
+  public boolean halfTurn() {
+    turnSpeed = 0.5 * -1;
+
+    if(averageDisplacement < Constants.EncoderConstants.HALF_TURN) {
+      SmartDashboard.putNumber("Revolutions Tracked", avgRevolutionsTracked);
+      differentialDriveSub.arcadeDrive(0, turnSpeed); 
+      updateRevolutionsTracked();
+      return true;
+    }
+    stop();
+    return false;
   }
 
   public void driveWithJoystick() {
