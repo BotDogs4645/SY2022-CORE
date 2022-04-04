@@ -214,18 +214,6 @@ public class ShooterIntegratedPID extends SubsystemBase {
     return loadie.getSelectedSensorVelocity(0);
   }
 
-  // public void toggleOn() {
-  //   countee = 0;
-  //   avg_error = 0;
-
-  //   if (isAtSetpoint()) {
-  //     upperBeltIndex();
-  //     lastShotTime = Timer.getFPGATimestamp();
-  //   }
-
-  //   loadie.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
-  // }
-
   public void toggleOff() {
     stopCargo();
     shootie.set(TalonFXControlMode.Disabled, 0);

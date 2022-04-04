@@ -5,6 +5,7 @@ import java.util.Map;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANSparkMax;
 
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -58,6 +59,8 @@ public class DriveTrain extends SubsystemBase {
   public static boolean inPreferredPosition = false;
   private Object foundTarget = new Object();
   public LimelightMath LimeMath;
+  public boolean resetHalfTurn = true;
+  public double avgRevolutionsTracked;
 
   public boolean testingMode = false;
 
@@ -247,5 +250,26 @@ public class DriveTrain extends SubsystemBase {
       }
       differentialDriveSub.tankDrive(finalRot, -finalRot);
     }
+  }
+  public void updateRevolutionsTracked() {
+    if (resetHalfTurn == true) {
+      resetEncoders();
+      resetHalfTurn = false;
+    }
+  }
+  public boolean halfTurn() {
+    turnSpeed = 0.5 * -1;
+
+    if(averageDisplacement < Constants.EncoderConstants.HALF_TURN) {
+      SmartDashboard.putNumber("Revolutions Tracked", avgRevolutionsTracked);
+      differentialDriveSub.arcadeDrive(0, turnSpeed); 
+      updateRevolutionsTracked();
+      return true;
+    }
+    stop();
+    return false;
+  }
+  public void absorb() {
+    
   }
 }

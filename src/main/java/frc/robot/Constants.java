@@ -95,6 +95,8 @@ public final class Constants {
         public static final double kP = 0.0080; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
         public static final double kI = 0.00092; // NOT USED
         public static final double kD = 1; // NOT USE
+
+        public static final int HALF_TURN = 3748;
     }
   
     public static final class ClimberConstants {
@@ -109,5 +111,6 @@ public final class Constants {
     public static final class IndexerConstants {
         public static int VERTICAL_INDEXER_MOTOR  = 6; //PLACEHOLDERS
         public static int HORIZONTAL_INDEXER_MOTOR = 7;
+        public static final int INTAKE_MOTOR = 3; // intake
     }
 }

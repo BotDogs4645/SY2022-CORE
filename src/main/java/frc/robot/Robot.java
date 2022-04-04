@@ -4,6 +4,12 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.LimelightAlignToLower;
+import frc.robot.commands.ToClosestPlottedPosition;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.RobotContainer;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -55,11 +61,14 @@ public class Robot extends TimedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    m_autonomousCommand = m_robotContainer.getAutoCommand();
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void teleopInit() {
