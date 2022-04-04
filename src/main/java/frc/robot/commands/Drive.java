@@ -30,10 +30,7 @@ public class Drive extends CommandBase {
   @Override
   public void execute() {
     SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
-    
-    //indexer constantly running
-    indexerSubsystem.indexCargo();
-
+  
     if(DriveTrain.driveMode == Constants.DriveModes.LIMELIGHT_DRIVE) { // HMM
       ledMode.setNumber(1);
       driveTrainSubsystem.trackObject();

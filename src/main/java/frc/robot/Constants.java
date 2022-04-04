@@ -8,9 +8,13 @@ public final class Constants {
     }
     public static final class GamepadButtons {    
         // misc. buttons
-        public static int SHOOTER = 1;
-        public static int CLIMBER_BUTTON = 4;
-        public static int GRIP_BUTTON = 7;
+        public static int SHOOTER = 2;
+        public static int CLIMBER_BUTTON = 4; // hmmm
+
+        public static int ABSORB = 6; // intake + indexer button
+        public static int UNABSORB = 3; // reverse indexer  & intake (unabsorb)
+
+        public static int VERTICAL_INDEXER = 5;
     }
 
     public static final class DriveConstants {
@@ -33,7 +37,6 @@ public final class Constants {
         public static final double MIN_ROT_SPEED = .15;
         public static final double ROT_MULTIPLIER = -0.05;
     }
-
     public static final class LimelightConstants {
         public static final double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
     }
@@ -91,5 +94,6 @@ public final class Constants {
     public static final class IndexerConstants {
         public static int VERTICAL_INDEXER_MOTOR  = 6; //PLACEHOLDERS
         public static int HORIZONTAL_INDEXER_MOTOR = 7;
+        public static final int INTAKE_MOTOR = 3; // intake
     }
 }
