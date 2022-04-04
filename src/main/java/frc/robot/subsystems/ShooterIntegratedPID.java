@@ -45,7 +45,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public boolean isAtSetpoint = false;
 
   // MANUAL CONTROL
-  public boolean testingMode = false;
+  public boolean testingMode = true;
 
   private boolean limelightModeEnabled = false;
   public boolean canShoot = false;
@@ -157,7 +157,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
       Shuffleboard.getTab("Shooter")
           .add("Flywheel D", Constants.IntegratedShooterPID.kD)
           .withWidget(BuiltInWidgets.kNumberSlider)
-          .withProperties(Map.of("min", 0, "max", 1.0)) // specify widget properties here
+          .withProperties(Map.of("min", 0, "max", 10.0)) // specify widget properties here
           .getEntry()
           .addListener(event -> {
             this.loadie.config_kD(0, event.getEntry().getValue().getDouble(),
