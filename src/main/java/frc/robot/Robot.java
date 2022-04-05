@@ -1,8 +1,16 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.LimelightAlignToLower;
+import frc.robot.commands.ToClosestPlottedPosition;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Indexer;
+import frc.robot.RobotContainer;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,11 +27,13 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  
   @Override
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    CameraServer.startAutomaticCapture();
     //m_robotContainer.driveSubsystem.declareGrip();
   }
 
@@ -52,7 +62,9 @@ public class Robot extends TimedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    m_autonomousCommand = m_robotContainer.getAutoCommand();
+  }
 
   /** Autonomous Sequence assumes that the robot starts out with the robot aligned with a cargo ball
    *  1. Taxis bot out of tarmac and intakes a cargo
@@ -64,11 +76,16 @@ public class Robot extends TimedRobot {
     RobotContainer.driveSubsystem.encoderDrive();
     if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
       // INTAKE CODE! --> while its moving
+      RobotContainer.indexerSubsystem.absorb();
+
       RobotContainer.driveSubsystem.halfTurn();
       if(RobotContainer.driveSubsystem.avgRevolutionsTracked >= Constants.EncoderConstants.HALF_TURN) {
         RobotContainer.driveSubsystem.trackObject();
         RobotContainer.driveSubsystem.stop();
-        RobotContainer.shooter.requestToggle();
+        
+        // ↓ takes RPM instead of percentage as param ↓
+        RobotContainer.shooterSubsystem.setVelocity(3395);
+
       }
     }
   }

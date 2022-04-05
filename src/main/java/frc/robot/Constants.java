@@ -1,6 +1,10 @@
 package frc.robot;
 
 public final class Constants {
+
+    public static final class JoystickButtons {
+        public static int LIMEY_TOGGLE = 7;
+    }
     public static final class DriveModes {
         public static int LIMELIGHT_DRIVE = 2;
         public static int ENCODER_DRIVE = 3;
@@ -15,6 +19,7 @@ public final class Constants {
         public static int UNABSORB = 3; // reverse indexer  & intake (unabsorb)
 
         public static int VERTICAL_INDEXER = 5;
+
     }
 
     public static final class DriveConstants {
@@ -36,9 +41,24 @@ public final class Constants {
         // limelight tracking constants
         public static final double MIN_ROT_SPEED = .15;
         public static final double ROT_MULTIPLIER = -0.05;
+        
+        // Drive Modes
+        public static int LIMELIGHT_DRIVE = 6;
+        public static int ENCODER_DRIVE = 2;
+		public static int JOYSTICK_DRIVE = 1;
     }
+
     public static final class LimelightConstants {
-        public static final double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
+        public static double LIMELIGHT_HEIGHT = 22.955; // distance from ground in inches
+        public static double LIMELIGHT_ANGLE = 30;
+        public static double LIMELIGHT_ROTATION_F = .2;
+        public static double LIMELIGHT_ROTATION_P = .12;
+        public static double LIMELIGHT_ROTATION_I = 0;
+        public static double LIMELIGHT_ROTATION_D = 0;
+        public static double LIMELIGHT_ROTATION_TOLERANCE = .8;
+        public static double LIMELIGHT_FOW_P = .1;
+        public static double LIMELIGHT_FOW_F = .2;
+
     }
 
     public static final class GameConstants {
@@ -50,8 +70,7 @@ public final class Constants {
         public final static int SHOOTIE_ID = 13;
         public final static int LOADIE_ID = 12; // bottom shooter
 
-        public static double SHOOTIE_RPM_SETPOINT = 6350.0; // 1560
-        public static double LOADIE_RPM_SETPOINT = 6350.0;
+        public static double RPM_SETPOINT = 6350.0; // 1560
 
         public static final double MAX_RPM = 6380.0;
 
@@ -59,6 +78,8 @@ public final class Constants {
         public static final double kI = 0;
         public static final double kD = 5.75; // 70
         public static final double kF = 0.0442818804; // SHOOTIE_RPM_SETPOINT / MAX_RPM; //(1023 * .75) / 2260; // 22600
+        public static final double kIZone = 0;
+        public static final double peakOut = 1;
 
         public static final int SLOT_ID = 0;
         public static final int PID_LOOP_ID = 0;
@@ -80,6 +101,8 @@ public final class Constants {
         public static final double kP = 0.0080; // INCREASE FOR TOMMOROW, GYRO IS BACKWARDS TOO, FIX formerly 0.0097
         public static final double kI = 0.00092; // NOT USED
         public static final double kD = 1; // NOT USE
+
+        public static final int HALF_TURN = 3748;
     }
   
     public static final class ClimberConstants {
@@ -92,6 +115,7 @@ public final class Constants {
     }
   
     public static final class IndexerConstants {
+
         public static int VERTICAL_INDEXER_MOTOR  = 0; 
         public static int HORIZONTAL_INDEXER_MOTOR = 1; // NEEDS TO BE UPDATED
         public static final int INTAKE_MOTOR = 3; // intake; NEEDS TO BE UPDATED

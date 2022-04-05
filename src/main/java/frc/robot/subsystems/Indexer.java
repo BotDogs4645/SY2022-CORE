@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -10,6 +12,7 @@ import frc.robot.Constants;
 public class Indexer extends SubsystemBase {
   private WPI_TalonFX verticalIndexerMotor;
   private WPI_TalonSRX horizontalIndexerMotor;
+
 
   private WPI_TalonSRX intakeMotor = new WPI_TalonSRX(Constants.IndexerConstants.INTAKE_MOTOR);
 
@@ -20,8 +23,8 @@ public class Indexer extends SubsystemBase {
     //Indexer splits path from intake to shooter into vertical and horizontal belt systems. 
     this.verticalIndexerMotor = verticalIndexerMotor;
     this.horizontalIndexerMotor = horizontalIndexerMotor;
-    stop();
   }
+
 
   /*enables intake and bottom indexer*/
   public void absorb() {
