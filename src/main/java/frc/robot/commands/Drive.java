@@ -24,18 +24,22 @@ public class Drive extends CommandBase {
   @Override
   public void execute() {
     SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
-    
-    if(DriveTrain.driveMode == Constants.DriveConstants.LIMELIGHT_DRIVE) { // HMM
+  
+    if(DriveTrain.driveMode == Constants.DriveModes.LIMELIGHT_DRIVE) { // HMM
+      ledMode.setNumber(1);
+      driveTrainSubsystem.trackObject();
     }
-    else if(DriveTrain.driveMode == Constants.DriveConstants.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
+    else if(DriveTrain.driveMode == Constants.DriveModes.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
       driveTrainSubsystem.encoderDrive();
       if (driveTrainSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT)
       {
-        DriveTrain.driveMode = Constants.DriveConstants.JOYSTICK_DRIVE;
+        ledMode.setNumber(1);
+        driveTrainSubsystem.trackObject();
+        DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE;
       }
     }
     else { 
-      DriveTrain.driveMode = Constants.DriveConstants.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+      DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
       driveTrainSubsystem.resetEncoders();
       driveTrainSubsystem.driveWithJoystick();
     }

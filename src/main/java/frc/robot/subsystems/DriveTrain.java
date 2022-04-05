@@ -53,6 +53,10 @@ public class DriveTrain extends SubsystemBase {
   private double rawEncoderOutRight; 
   public double averageDisplacement;
 
+  public boolean resetHalfTurn = true;
+  public double avgRevolutionsTracked;
+
+
   private GripPipeline pipe;
   private VisionThread VisionThread;
   public static boolean alignedToHub = false;
@@ -76,8 +80,10 @@ public class DriveTrain extends SubsystemBase {
   
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
+
     driveMode = Constants.DriveConstants.JOYSTICK_DRIVE;
     LimeMath = RobotContainer.LimeMath;
+
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
@@ -132,9 +138,36 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = (leftDistanceTraveled + rightDistanceTraveled) / 2; // updates average displacement
   }
 
+  public void updateRevolutionsTracked() {
+    if (resetHalfTurn == true) {
+      resetEncoders();
+      resetHalfTurn = false;
+    }
+
+    rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition() / Constants.EncoderConstants.k_UNITS_P_REVOLUTION;
+    rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1 / Constants.EncoderConstants.k_UNITS_P_REVOLUTION;
+    
+    avgRevolutionsTracked = (rawEncoderOutLeft + rawEncoderOutRight) / 2;
+  }
+
+  public boolean halfTurn() {
+    turnSpeed = 0.5 * -1;
+
+    if(averageDisplacement < Constants.EncoderConstants.HALF_TURN) {
+      SmartDashboard.putNumber("Revolutions Tracked", avgRevolutionsTracked);
+      differentialDriveSub.arcadeDrive(0, turnSpeed); 
+      updateRevolutionsTracked();
+      return true;
+    }
+    stop();
+    return false;
+  }
+
   public void driveWithJoystick() {
     driveSpeed = driveController.getY();
     turnSpeed = driveController.getZ();
+
+    // set limit on speed, increase slew rate limiter, fix vertical intake button, make intake whileHeld() and reset them 
 
     driveSpeed = filterLeft.calculate(driveController.getY() * -1);
     turnSpeed = filterRight.calculate(driveController.getZ() * -1);
@@ -156,7 +189,7 @@ public class DriveTrain extends SubsystemBase {
   
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
-     // getCorrection(); // updates turn
+      // getCorrection(); // updates turn
       differentialDriveSub.arcadeDrive(driveSpeed, 0); 
       updateAverageDisplacement();
       return true;

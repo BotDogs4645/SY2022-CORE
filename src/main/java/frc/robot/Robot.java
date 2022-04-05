@@ -66,13 +66,18 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robotContainer.getAutoCommand();
   }
 
-  /** This function is called periodically during autonomous. */
+  /** Autonomous Sequence assumes that the robot starts out with the robot aligned with a cargo ball
+   *  1. Taxis bot out of tarmac and intakes a cargo
+   *  2. Rotate 180 deg
+   *  3. Call limelight align method and shoot both cargo
+   */
   @Override
   public void autonomousPeriodic() {
     RobotContainer.driveSubsystem.encoderDrive();
     if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
       // INTAKE CODE! --> while its moving
       RobotContainer.indexerSubsystem.absorb();
+
       RobotContainer.driveSubsystem.halfTurn();
       if(RobotContainer.driveSubsystem.avgRevolutionsTracked >= Constants.EncoderConstants.HALF_TURN) {
         RobotContainer.driveSubsystem.trackObject();
@@ -80,6 +85,7 @@ public class Robot extends TimedRobot {
         
         // ↓ takes RPM instead of percentage as param ↓
         RobotContainer.shooterSubsystem.setVelocity(3395);
+
       }
     }
   }

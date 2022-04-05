@@ -192,6 +192,13 @@ public class ShooterIntegratedPID extends SubsystemBase {
   }
 
 
+  public double getDistanceFromHub() {
+    double yOffset = ty.getDouble(0.0);
+    double radians = Math.toRadians(yOffset);
+    double limeDistance = ((Constants.LimelightConstants.LIMELIGHT_HEIGHT - Constants.GameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
+  
+    double exitDistance = Math.pow((Math.pow((Math.pow(limeDistance, 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
+
 
   public void setVelocity(double rpm) {
     Constants.IntegratedShooterPID.RPM_SETPOINT = rpm;
