@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
@@ -29,7 +30,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
   private WPI_TalonFX loadie;
 
   private WPI_TalonFX vertical;
-  private WPI_TalonFX horizontal;
+  private WPI_TalonSRX horizontal;
   private double speed = .3;
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
@@ -55,9 +56,9 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
   private static double lastShotTime = Integer.MAX_VALUE;
 
-  public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie, WPI_TalonFX vertical, WPI_TalonFX horizontal) {
+  public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie, WPI_TalonFX vertical, WPI_TalonSRX horizontalindexermotor) {
     this.vertical = vertical;
-    this.horizontal = horizontal;
+    this.horizontal = horizontalindexermotor;
     LimeMath = RobotContainer.LimeMath;
 
     this.shootie = shootie;
@@ -192,13 +193,6 @@ public class ShooterIntegratedPID extends SubsystemBase {
   }
 
 
-  public double getDistanceFromHub() {
-    double yOffset = ty.getDouble(0.0);
-    double radians = Math.toRadians(yOffset);
-    double limeDistance = ((Constants.LimelightConstants.LIMELIGHT_HEIGHT - Constants.GameConstants.HIGH_GOAL_HEIGHT) / Math.tan(radians)) / 12;
-  
-    double exitDistance = Math.pow((Math.pow((Math.pow(limeDistance, 2) - 0.23512801), .5) + 0.0198161929) + 0.060516, .5);
-
 
   public void setVelocity(double rpm) {
     Constants.IntegratedShooterPID.RPM_SETPOINT = rpm;
@@ -255,6 +249,26 @@ public class ShooterIntegratedPID extends SubsystemBase {
   public void rejectCargo() {
     vertical.set(-speed);
     horizontal.set(-speed);
+  }
+  public void shoot(int speed, int balls) {
+    double lastShotTime = Timer.getFPGATimestamp();
+    if(balls == 1) {
+      upperBeltIndex();
+      setVelocity(speed);
+      if(Timer.getFPGATimestamp() - lastShotTime < 1) {
+        setVelocity(0);
+        horizontal.set(0);
+      }
+    }
+    if(balls == 2) {
+      upperBeltIndex();
+      setVelocity(speed);
+      if (Timer.getFPGATimestamp() - lastShotTime < 4) {
+        horizontal.set(0);
+        setVelocity(0);
+      }
+    }
+
   }
 
 }

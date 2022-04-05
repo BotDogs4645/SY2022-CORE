@@ -77,9 +77,8 @@ public class LimelightMath extends SubsystemBase {
         this.ty = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("ty").getDouble(0.0);
         this.tx = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("tx").getDouble(0.0);
         double radians = Math.toRadians(ty) + Math.toRadians(LimelightConstants.LIMELIGHT_ANGLE);
-        //In inchies vv
-        double hypotenuse = ((Constants.GameConstants.HIGH_GOAL_HEIGHT - Constants.LimelightConstants.LIMELIGHT_HEIGHT) / Math.sin(radians)) / 12; // in feet
-
+        //In feet vv
+        double hypotenuse = ((Constants.GameConstants.HIGH_GOAL_HEIGHT - Constants.LimelightConstants.LIMELIGHT_HEIGHT) / Math.sin(radians)) / 12;
         return hypotenuse;
     }
 

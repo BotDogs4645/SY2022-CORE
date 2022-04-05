@@ -37,8 +37,8 @@ public class DriveTrain extends SubsystemBase {
   private double driveSpeed;
   private double turnSpeed;
 
-  SlewRateLimiter filterLeft = new SlewRateLimiter(2);
-  SlewRateLimiter filterRight = new SlewRateLimiter(2);
+  SlewRateLimiter filterLeft = new SlewRateLimiter(2.5);
+  SlewRateLimiter filterRight = new SlewRateLimiter(2.5);
 
   private double leftDistanceTraveled;
   private double rightDistanceTraveled;
@@ -56,16 +56,13 @@ public class DriveTrain extends SubsystemBase {
   public boolean resetHalfTurn = true;
   public double avgRevolutionsTracked;
 
-
   private GripPipeline pipe;
   private VisionThread VisionThread;
   public static boolean alignedToHub = false;
   public static boolean inPreferredPosition = false;
   private Object foundTarget = new Object();
-  public LimelightMath LimeMath;
-  public boolean resetHalfTurn = true;
-  public double avgRevolutionsTracked;
 
+  public LimelightMath LimeMath;
   public boolean testingMode = true;
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
@@ -81,9 +78,8 @@ public class DriveTrain extends SubsystemBase {
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
     this.driveController = driveController;
 
-    driveMode = Constants.DriveConstants.JOYSTICK_DRIVE;
+    driveMode = Constants.DriveModes.JOYSTICK_DRIVE;
     LimeMath = RobotContainer.LimeMath;
-
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
@@ -143,16 +139,13 @@ public class DriveTrain extends SubsystemBase {
       resetEncoders();
       resetHalfTurn = false;
     }
-
     rawEncoderOutLeft = encLeftMotor.getSelectedSensorPosition() / Constants.EncoderConstants.k_UNITS_P_REVOLUTION;
     rawEncoderOutRight = encRightMotor.getSelectedSensorPosition() * -1 / Constants.EncoderConstants.k_UNITS_P_REVOLUTION;
-    
     avgRevolutionsTracked = (rawEncoderOutLeft + rawEncoderOutRight) / 2;
   }
 
   public boolean halfTurn() {
     turnSpeed = 0.5 * -1;
-
     if(averageDisplacement < Constants.EncoderConstants.HALF_TURN) {
       SmartDashboard.putNumber("Revolutions Tracked", avgRevolutionsTracked);
       differentialDriveSub.arcadeDrive(0, turnSpeed); 
@@ -165,9 +158,7 @@ public class DriveTrain extends SubsystemBase {
 
   public void driveWithJoystick() {
     driveSpeed = driveController.getY();
-    turnSpeed = driveController.getZ();
-
-    // set limit on speed, increase slew rate limiter, fix vertical intake button, make intake whileHeld() and reset them 
+    turnSpeed = driveController.getZ() * 0.8;
 
     driveSpeed = filterLeft.calculate(driveController.getY() * -1);
     turnSpeed = filterRight.calculate(driveController.getZ() * -1);
@@ -211,7 +202,7 @@ public class DriveTrain extends SubsystemBase {
     else if (rot < 0) {
       rot -= Constants.LimelightConstants.LIMELIGHT_ROTATION_F;
     }
-
+    
     if (Math.abs(LimeMath.tx) < .8) {
       alignedToHub = true;
     } else {
@@ -258,38 +249,6 @@ public class DriveTrain extends SubsystemBase {
     return LimeMath.getClosestRelatedDistance(true);
   }
 
-  // grip declarations
-  public void declareGrip() {
-    UsbCamera cam = new UsbCamera("GRIP Cam","/dev/video0");
-    cam.setResolution(480, 720);
-    VisionThread = new VisionThread(cam, new GripPipeline(), pipeline -> {
-    synchronized(foundTarget) {
-      pipe = pipeline;
-    }
-    });
-  }
-
-  public void orientWithGrip() {
-    synchronized (foundTarget) {
-      Rect r = Imgproc.boundingRect(pipe.findBlobsOutput());
-      double finalRot = 0.0;
-      double centerX = r.x;
-
-      if (centerX < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-        finalRot = Constants.DriveConstants.ROT_MULTIPLIER * centerX + Constants.DriveConstants.MIN_ROT_SPEED;
-      }
-      else if (centerX > .25) {   // dampens the rotation at the end while turning
-        finalRot = Constants.DriveConstants.ROT_MULTIPLIER * centerX - Constants.DriveConstants.MIN_ROT_SPEED;
-      }
-      differentialDriveSub.tankDrive(finalRot, -finalRot);
-    }
-  }
-  public void updateRevolutionsTracked() {
-    if (resetHalfTurn == true) {
-      resetEncoders();
-      resetHalfTurn = false;
-    }
-  }
   public void trackObject() {
     double xOffset = -tx.getDouble(0.0);
     SmartDashboard.putNumber("xOffset", xOffset);
@@ -301,17 +260,5 @@ public class DriveTrain extends SubsystemBase {
       finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
     differentialDriveSub.tankDrive(finalRot, -finalRot);
-  }
-  public boolean halfTurn() {
-    turnSpeed = 0.5 * -1;
-
-    if(averageDisplacement < Constants.EncoderConstants.HALF_TURN) {
-      SmartDashboard.putNumber("Revolutions Tracked", avgRevolutionsTracked);
-      differentialDriveSub.arcadeDrive(0, turnSpeed); 
-      updateRevolutionsTracked();
-      return true;
-    }
-    stop();
-    return false;
   }
 }

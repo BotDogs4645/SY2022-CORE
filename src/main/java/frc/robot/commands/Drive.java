@@ -10,6 +10,7 @@ import frc.robot.subsystems.DriveTrain;
 public class Drive extends CommandBase {
 
   private DriveTrain driveTrainSubsystem;
+  private NetworkTableEntry ledMode = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("ledMode");
 
   public Drive(DriveTrain subsystem) {
     driveTrainSubsystem = subsystem;
@@ -31,6 +32,7 @@ public class Drive extends CommandBase {
     }
     else if(DriveTrain.driveMode == Constants.DriveModes.ENCODER_DRIVE) { // 2 | while encoders have not yet reached target distance and need to continue measuring...
       driveTrainSubsystem.encoderDrive();
+      ledMode.setNumber(0);
       if (driveTrainSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT)
       {
         ledMode.setNumber(1);
