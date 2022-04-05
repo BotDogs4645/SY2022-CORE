@@ -257,6 +257,18 @@ public class DriveTrain extends SubsystemBase {
       resetHalfTurn = false;
     }
   }
+  public void trackObject() {
+    double xOffset = -tx.getDouble(0.0);
+    SmartDashboard.putNumber("xOffset", xOffset);
+    double finalRot = 0.0;
+    if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
+    }
+    else if (xOffset > .25) {   // dampens the rotation at the end while turning
+      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
+    }
+    differentialDriveSub.tankDrive(finalRot, -finalRot);
+  }
   public boolean halfTurn() {
     turnSpeed = 0.5 * -1;
 

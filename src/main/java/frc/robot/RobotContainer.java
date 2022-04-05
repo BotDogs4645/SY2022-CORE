@@ -20,6 +20,7 @@ import frc.robot.commands.LimelightAlignToLower;
 import frc.robot.commands.ToClosestPlottedPosition;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightMath;
 import frc.robot.commands.AutoProfile1;
 import frc.robot.commands.ChangeDriveMode;
@@ -73,6 +74,7 @@ public class RobotContainer {
   public static final ShooterIntegratedPID shooterSubsystem = new ShooterIntegratedPID(shooterMotor, shooterMotor2, verticalIndexerMotor, horizontalIndexerMotor);
   public final Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController, ahrs);
   public static LimelightMath LimeMath = new LimelightMath();
+  public static Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
   
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);

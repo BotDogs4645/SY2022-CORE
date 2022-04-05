@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.LimelightAlignToLower;
 import frc.robot.commands.ToClosestPlottedPosition;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Indexer;
 import frc.robot.RobotContainer;
 
 /**
@@ -68,6 +69,19 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    RobotContainer.driveSubsystem.encoderDrive();
+    if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
+      // INTAKE CODE! --> while its moving
+      RobotContainer.indexerSubsystem.absorb();
+      RobotContainer.driveSubsystem.halfTurn();
+      if(RobotContainer.driveSubsystem.avgRevolutionsTracked >= Constants.EncoderConstants.HALF_TURN) {
+        RobotContainer.driveSubsystem.trackObject();
+        RobotContainer.driveSubsystem.stop();
+        
+        // ↓ takes RPM instead of percentage as param ↓
+        RobotContainer.shooterSubsystem.setVelocity(3395);
+      }
+    }
   }
 
   @Override
