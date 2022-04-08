@@ -161,7 +161,7 @@ public class DriveTrain extends SubsystemBase {
     turnSpeed = driveController.getZ() * 0.8;
 
     driveSpeed = filterLeft.calculate(driveController.getY() * -1);
-    turnSpeed = filterRight.calculate(driveController.getZ() * -1);
+    turnSpeed = filterRight.calculate(driveController.getZ()); //* -1);
 
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
 

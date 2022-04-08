@@ -17,6 +17,7 @@ import frc.robot.commands.ToClosestPlottedPosition;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.LimelightMath;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -28,7 +29,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
+  public static double distanceToHub;
   public static double currentTime;
   private double lastCall = 0;
   UsbCamera driverVision;
@@ -89,7 +90,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     /*
-    SmartDashboard.putNumber("current time:", Timer.getFPGATimestamp());
+    SmartDashboard.putNumber("current time:"  , Timer.getFPGATimestamp());
     SmartDashboard.putNumber("last call:", lastCall);
 
 
@@ -112,6 +113,12 @@ public class Robot extends TimedRobot {
 
     //   }
     // }
+
+    RobotContainer.driveSubsystem.differentialDriveSub.tankDrive(0.3, 0.3);
+    Timer.delay(3.5);
+    RobotContainer.driveSubsystem.differentialDriveSub.tankDrive(0, 0);
+
+    
   }
 
   @Override
@@ -130,7 +137,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     currentTime = Timer.getFPGATimestamp();
     SmartDashboard.putBoolean("Limit Switch", RobotContainer.limitSwitch.get());
-
+    // ↓ returns the hypotenuse to the hub, not the horizontal distance ↓ 
+    distanceToHub = RobotContainer.LimeMath.getDistanceFromHub();
     RobotContainer.limitSwitchState = RobotContainer.limitSwitch.get(); 
   }
 
