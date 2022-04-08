@@ -19,6 +19,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -192,7 +193,7 @@ public class DriveTrain extends SubsystemBase {
     if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
       SmartDashboard.putNumber("Average Displacement", averageDisplacement);
       // getCorrection(); // updates turn
-      differentialDriveSub.arcadeDrive(driveSpeed, 0); 
+      differentialDriveSub.tankDrive(Constants.EncoderConstants.SPEED, Constants.EncoderConstants.SPEED); 
       updateAverageDisplacement();
       return true;
     }
@@ -219,10 +220,10 @@ public class DriveTrain extends SubsystemBase {
     } else {
       alignedToHub = false;
     }
-
+    
     differentialDriveSub.arcadeDrive(0, rot);
   }
-
+  
   public boolean isAligned() {
     return alignedToHub;
   }
@@ -271,5 +272,23 @@ public class DriveTrain extends SubsystemBase {
       finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
     }
     differentialDriveSub.tankDrive(finalRot, -finalRot);
+  }
+
+  public void autoDrive() {
+    double sped = 0.4;
+    differentialDriveSub.arcadeDrive(sped, 0);
+    SmartDashboard.putNumber("tank drive", sped);
+    SmartDashboard.putNumber("last call", Timer.getFPGATimestamp());
+    /*
+    RobotContainer.lowerLeftMotor.set(0.3);
+    RobotContainer.upperLeftMotor.set(0.3);
+    RobotContainer.lowerRightMotor.set(-0.3);
+    RobotContainer.upperRightMotor.set(-0.3);
+    */
+    //Timer.delay(3);
+    //RobotContainer.lowerLeftMotor.set(0);
+    //RobotContainer.upperLeftMotor.set(0);
+    //RobotContainer.lowerRightMotor.set(0);
+    //RobotContainer.upperRightMotor.set(0);
   }
 }
