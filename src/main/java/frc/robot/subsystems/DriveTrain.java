@@ -254,7 +254,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public double getLimeDistanceToHub() {
-    return LimeMath.hypotenuse;
+    return LimeMath.adjacent;
   }
 
   public double getClosestRelatedDistance() {

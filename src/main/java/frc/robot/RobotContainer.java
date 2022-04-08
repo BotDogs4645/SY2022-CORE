@@ -17,14 +17,11 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Drive;
-import frc.robot.commands.LimelightAlignToLower;
-import frc.robot.commands.ToClosestPlottedPosition;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightMath;
 import frc.robot.Constants.JoystickButtons;
-import frc.robot.commands.AutoProfile1;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.subsystems.ShooterIntegratedPID;
 
@@ -102,8 +99,8 @@ public class RobotContainer {
     //     new LimelightAlignToLower(driveSubsystem),
     //     new ToClosestPlottedPosition(driveSubsystem))
     //   ); 
-      chooser.addOption("Main", new InstantCommand());
-      chooser.addOption("Auto 1", new AutoProfile1(driveSubsystem, shooterSubsystem));
+      // chooser.addOption("Main", new InstantCommand());
+      // chooser.addOption("Auto 1", new AutoProfile1(driveSubsystem, shooterSubsystem));
 
       // chooser.addOption("auto1",);
       Shuffleboard.getTab("Main").add("Auto Command", chooser).withPosition(1, 1);

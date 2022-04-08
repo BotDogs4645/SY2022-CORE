@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.logging.LogManager;
 
 import javax.swing.text.html.HTMLDocument.BlockElement;
 
@@ -216,7 +217,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
     Constants.IntegratedShooterPID.RPM_SETPOINT = rpm;
     loadie.set(TalonFXControlMode.Velocity, (Constants.IntegratedShooterPID.RPM_SETPOINT * Constants.IntegratedShooterPID.CONVERSION_RATE));
   }
-
+  
   public boolean isAtSetpoint() {
     if (Math.abs(this.getVelocity() - Constants.IntegratedShooterPID.RPM_SETPOINT) < 300) {
       setPointCount++;

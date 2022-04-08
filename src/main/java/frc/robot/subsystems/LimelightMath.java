@@ -24,7 +24,7 @@ public class LimelightMath extends SubsystemBase {
 
     private HashMap<Double, Double> control;
 
-    public double hypotenuse;
+    public double adjacent;
 
     /* 
         Unused:
@@ -66,8 +66,8 @@ public class LimelightMath extends SubsystemBase {
         target = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("tv").getDouble(0.0);
         SmartDashboard.putNumber("tar", target);
         if (target == 0.0) {
-            this.hypotenuse = getDistanceFromHub();
-            this.limelightDistanceInNT.setDouble(hypotenuse);
+            this.adjacent = getDistanceFromHub();
+            this.limelightDistanceInNT.setDouble(adjacent);
             this.velocityNT.setDouble(v);
             this.nTx.setDouble(tx);
             this.nTy.setDouble(ty);
@@ -79,8 +79,8 @@ public class LimelightMath extends SubsystemBase {
         this.tx = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("tx").getDouble(0.0);
         double radians = Math.toRadians(ty) + Math.toRadians(LimelightConstants.LIMELIGHT_ANGLE);
         //In feet vv
-        double hypotenuse = ((Constants.GameConstants.HIGH_GOAL_HEIGHT - Constants.LimelightConstants.LIMELIGHT_HEIGHT) / Math.sin(radians)) / 12;
-        return hypotenuse;
+        double adjacent = ((Constants.GameConstants.HIGH_GOAL_HEIGHT - Constants.LimelightConstants.LIMELIGHT_HEIGHT) / Math.tan(radians)) / 12;
+        return adjacent;
     }
 
     public double relateDistanceToRPM() {
@@ -93,9 +93,9 @@ public class LimelightMath extends SubsystemBase {
         double curClosestRPM = 0;
         // Searches for the closest distance to a currently plotted distance -> rpm
         for (Map.Entry<Double, Double> entry : control.entrySet()) {
-            if (Math.abs(entry.getKey() - hypotenuse) < curClosestDistance) {
+            if (Math.abs(entry.getKey() - adjacent) < curClosestDistance) {
                 curClosest = entry.getKey();
-                curClosestDistance = Math.abs(entry.getKey() - hypotenuse);
+                curClosestDistance = Math.abs(entry.getKey() - adjacent);
                 curClosestRPM = entry.getValue();
             }
         } 
@@ -105,6 +105,8 @@ public class LimelightMath extends SubsystemBase {
             return curClosestRPM;
         }
     }
+
+
 
     public void ledSetDefaultState() {
         NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0);
