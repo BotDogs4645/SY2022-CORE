@@ -24,8 +24,8 @@ public class Drive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
-  
+    //SmartDashboard.putNumber("DriveTrain driveMode is toggled to:", DriveTrain.driveMode);
+    /*
     if(DriveTrain.driveMode == Constants.DriveModes.LIMELIGHT_DRIVE) { // HMM
       ledMode.setNumber(1);
       driveTrainSubsystem.trackObject();
@@ -41,10 +41,10 @@ public class Drive extends CommandBase {
       }
     }
     else { 
-      DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
-      driveTrainSubsystem.resetEncoders();
-      driveTrainSubsystem.driveWithJoystick();
-    }
+    */
+    DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
+    driveTrainSubsystem.resetEncoders();
+     driveTrainSubsystem.driveWithJoystick();
   }
 
   // Called once the command ends or is interrupted.

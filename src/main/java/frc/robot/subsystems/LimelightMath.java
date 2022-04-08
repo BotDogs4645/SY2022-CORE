@@ -7,6 +7,7 @@ import java.util.Map;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.LimelightConstants;
@@ -19,7 +20,7 @@ public class LimelightMath extends SubsystemBase {
     public double ty;
     public double tx;
     public double v;
-    public double target;
+    public double target = 0.0;
 
     private HashMap<Double, Double> control;
 
@@ -43,10 +44,9 @@ public class LimelightMath extends SubsystemBase {
     public LimelightMath() {
         // Correlating distances -> RPMs
         control = new HashMap<Double, Double>();
-        control.put(10.1, 10.2);
-        control.put(0.0, 0.0);
-        control.put(10.0, 10.0);
-        control.put(15.0,12.0);
+        control.put(9.676, 3365.0);
+        control.put(13.0545, 3910.0);
+        control.put(23.141, 6325.0);
 
         this.limelightDistanceInNT = Shuffleboard.getTab("LimeTuning")
                 .add("DistanceOutput", 0.0)
@@ -64,7 +64,8 @@ public class LimelightMath extends SubsystemBase {
 
     public void periodic() {
         target = NetworkTableInstance.getDefault().getTable("limelight-console").getEntry("tv").getDouble(0.0);
-        if (target == 1.0) {
+        SmartDashboard.putNumber("tar", target);
+        if (target == 0.0) {
             this.hypotenuse = getDistanceFromHub();
             this.limelightDistanceInNT.setDouble(hypotenuse);
             this.velocityNT.setDouble(v);
@@ -94,7 +95,7 @@ public class LimelightMath extends SubsystemBase {
         for (Map.Entry<Double, Double> entry : control.entrySet()) {
             if (Math.abs(entry.getKey() - hypotenuse) < curClosestDistance) {
                 curClosest = entry.getKey();
-                curClosestDistance = entry.getKey() - hypotenuse;
+                curClosestDistance = Math.abs(entry.getKey() - hypotenuse);
                 curClosestRPM = entry.getValue();
             }
         } 

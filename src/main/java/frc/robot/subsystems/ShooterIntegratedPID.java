@@ -54,12 +54,14 @@ public class ShooterIntegratedPID extends SubsystemBase {
   private int setPointCount = 0;
   private int countee = 0;
 
+  private boolean enabledManual = false;
+
   private static double lastShotTime = Integer.MAX_VALUE;
 
   public ShooterIntegratedPID(WPI_TalonFX shootie, WPI_TalonFX loadie, WPI_TalonFX vertical, WPI_TalonSRX horizontalindexermotor) {
     this.vertical = vertical;
     this.horizontal = horizontalindexermotor;
-    LimeMath = RobotContainer.LimeMath;
+    this.LimeMath = RobotContainer.LimeMath;
 
     this.shootie = shootie;
     shootie.configFactoryDefault();
@@ -76,8 +78,8 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
     shootie.follow(loadie);
 
-    shootie.setInverted(TalonFXInvertType.CounterClockwise);
-    loadie.setInverted(TalonFXInvertType.Clockwise);
+    shootie.setInverted(TalonFXInvertType.Clockwise);
+    loadie.setInverted(TalonFXInvertType.CounterClockwise);
 
     _rightConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
 
@@ -111,6 +113,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
           .getEntry()
           .addListener(event -> {
             this.setVelocity(event.getEntry().getValue().getDouble());
+            setVelocity(event.getEntry().getValue().getDouble());
           }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
       Shuffleboard.getTab("Shooter")
@@ -164,6 +167,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
             this.loadie.config_kD(0, event.getEntry().getValue().getDouble(),
                 30);
           }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+          shootie.follow(loadie);
     }
   }
 
@@ -171,10 +175,9 @@ public class ShooterIntegratedPID extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (limelightModeEnabled && !testingMode) {
+    if (loadie.getMotorOutputPercent() > 0) {
       SmartDashboard.putNumber("shootie@errorRPM:", shootie.getClosedLoopError(0));
-      SmartDashboard.putNumber("shootie@target:", loadie.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID)
-          / Constants.IntegratedShooterPID.CONVERSION_RATE);
+      SmartDashboard.putNumber("shootie@target:", loadie.getClosedLoopTarget(Constants.IntegratedShooterPID.PID_LOOP_ID) / Constants.IntegratedShooterPID.CONVERSION_RATE);
       SmartDashboard.putNumber("shootie@currentRPM:", shootie.getSelectedSensorVelocity() * (2048.0 / 6000.0));
       SmartDashboard.putNumber("loadie@currentRPM:", loadie.getSelectedSensorVelocity() * (2048.0 / 6000.0));
       avg_error += loadie.getClosedLoopError();
@@ -192,7 +195,22 @@ public class ShooterIntegratedPID extends SubsystemBase {
     }
   }
 
-
+  public void setRPMFromDistanceAuto() {
+    SmartDashboard.putNumber("target", LimeMath.target);
+    if ((LimeMath.target == 1.0) && !enabledManual) {
+      enabledManual = true;
+      double closestRPMToDistance = LimeMath.getClosestRelatedDistance(false);
+      double closestDistance = LimeMath.getClosestRelatedDistance(true);
+      double curDistance = LimeMath.getDistanceFromHub();
+      double slope = 545.0 / 3.3785;
+      double inc = (curDistance - closestDistance) * slope;
+      setVelocity(closestRPMToDistance + inc);
+    }
+    if ((LimeMath.target == 0.0)) {
+      enabledManual = false;
+      toggleOff();
+    }
+  }
 
   public void setVelocity(double rpm) {
     Constants.IntegratedShooterPID.RPM_SETPOINT = rpm;
@@ -255,7 +273,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
     if(balls == 1) {
       upperBeltIndex();
       setVelocity(speed);
-      if(Timer.getFPGATimestamp() - lastShotTime < 1) {
+      if(Timer.getFPGATimestamp() - lastShotTime > 1) {
         setVelocity(0);
         horizontal.set(0);
       }
@@ -263,12 +281,10 @@ public class ShooterIntegratedPID extends SubsystemBase {
     if(balls == 2) {
       upperBeltIndex();
       setVelocity(speed);
-      if (Timer.getFPGATimestamp() - lastShotTime < 4) {
+      if (Timer.getFPGATimestamp() - lastShotTime > 4) {
         horizontal.set(0);
         setVelocity(0);
       }
     }
-
   }
-
 }

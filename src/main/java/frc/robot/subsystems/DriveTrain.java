@@ -72,7 +72,7 @@ public class DriveTrain extends SubsystemBase {
   NetworkTableEntry ty = table.getEntry("ty");
 
   private final AHRS ahrs = new AHRS();
-  private final DifferentialDrive differentialDriveSub;
+  public final DifferentialDrive differentialDriveSub;
   private final PIDController drivePID = new PIDController(Constants.EncoderConstants.kP, Constants.EncoderConstants.kI, Constants.EncoderConstants.kD);
   
   public DriveTrain(MotorControllerGroup leftMotors, MotorControllerGroup rightMotors, Joystick driveController, MotorController encLeftMotor, MotorController encRightMotor) {
@@ -164,6 +164,17 @@ public class DriveTrain extends SubsystemBase {
     turnSpeed = filterRight.calculate(driveController.getZ() * -1);
 
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
+
+    // LEFT CLIMBER TRIGGER
+    if(RobotContainer.buttonController.getLeftTriggerAxis() >= 0.5) {
+      SmartDashboard.putNumber("left trigger", RobotContainer.buttonController.getLeftTriggerAxis());
+      RobotContainer.climberSubsystem.climberDown();
+    }
+    // RIGHT CLIMBER TRIGGER
+    if(RobotContainer.buttonController.getRightTriggerAxis() >= 0.5) {
+      SmartDashboard.putNumber("right trigger", RobotContainer.buttonController.getRightTriggerAxis());
+      RobotContainer.climberSubsystem.climberUp(); //sets speed to 0
+    }
   }
 
   public void resetEncoders() {
@@ -173,7 +184,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public boolean encoderDrive() {
-    driveSpeed = Constants.EncoderConstants.SPEED * -1;
+    driveSpeed = Constants.EncoderConstants.SPEED * -1;  
 
     SmartDashboard.putNumber("drive speed", driveSpeed);
     SmartDashboard.putNumber("turn rate", turnSpeed);

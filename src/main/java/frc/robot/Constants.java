@@ -8,8 +8,17 @@ public final class Constants {
     }
 
     public static final class GamepadButtons {
-        public static int CLIMBER_BUTTON = 0; // CHANGE
+        //public static int CLIMBER_BUTTON = 0; // CHANGE
 
+        public static int LOWER_INTAKE = 2;
+        public static int RAISE_INTAKE = 4;
+
+        public static int ABSORB = 6;
+        public static int UNABSORB = 1;
+
+        public static int VERTICAL_INDEXER = 5;
+
+        /*
         public static int SHOOTER = 2;
 
         public static int LOWER_INTAKE = 1;
@@ -19,10 +28,13 @@ public final class Constants {
         public static int UNABSORB = 3;
 
         public static int VERTICAL_INDEXER = 5;
+        */
     }
 
     public static final class JoystickButtons {
         public static int LIMEY_TOGGLE = 7;
+        public static int SHOOTER = 5;
+        public static int SHOOTER_ENABLE = 6;
     }
 
     public static final class DriveConstants {
@@ -113,6 +125,6 @@ public final class Constants {
         public static int VERTICAL_INDEXER_MOTOR  = 0; 
         public static int HORIZONTAL_INDEXER_MOTOR = 1;
         public static final int INTAKE_MOTOR = 3; 
-        public static int RAISE_INTAKE_MOTOR = 2;
+        public static int RAISE_INTAKE_MOTOR = 4;
     }
 }

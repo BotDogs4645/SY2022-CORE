@@ -1,7 +1,12 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,6 +28,10 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public static double currentTime;
+  private double lastCall = 0;
+  UsbCamera driverVision;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -33,7 +42,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    CameraServer.startAutomaticCapture();
+   // UsbCamera camcam = new CameraServer();
+    driverVision = CameraServer.startAutomaticCapture(0);
     //m_robotContainer.driveSubsystem.declareGrip();
   }
 
@@ -64,6 +74,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutoCommand();
+    lastCall = Timer.getFPGATimestamp();
   }
 
   /** Autonomous Sequence assumes that the robot starts out with the robot aligned with a cargo ball
@@ -73,21 +84,30 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    RobotContainer.driveSubsystem.encoderDrive();
-    if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
-      // INTAKE CODE! --> while its moving
-      RobotContainer.indexerSubsystem.absorb();
+    /*
+    SmartDashboard.putNumber("current time:", Timer.getFPGATimestamp());
+    SmartDashboard.putNumber("last call:", lastCall);
 
-      RobotContainer.driveSubsystem.halfTurn();
-      if(RobotContainer.driveSubsystem.avgRevolutionsTracked >= Constants.EncoderConstants.HALF_TURN) {
-        RobotContainer.driveSubsystem.trackObject();
-        RobotContainer.driveSubsystem.stop();
-        
-        // ↓ takes RPM instead of percentage as param ↓
-        RobotContainer.shooterSubsystem.setVelocity(3395);
 
-      }
+    if(Timer.getFPGATimestamp() - lastCall < 3) {
+      RobotContainer.driveSubsystem.differentialDriveSub.arcadeDrive(0.3, 0);
     }
+    else { // stop
+      RobotContainer.driveSubsystem.differentialDriveSub.arcadeDrive(0, 0);
+    }
+    */
+     //RobotContainer.driveSubsystem.encoderDrive();
+    // if (RobotContainer.driveSubsystem.averageDisplacement >= Constants.EncoderConstants.TARGET_DISTANCE_FT) { // stop running encoderDrive
+    //   RobotContainer.indexerSubsystem.absorb();
+    //   RobotContainer.driveSubsystem.halfTurn();
+    //   if(RobotContainer.driveSubsystem.avgRevolutionsTracked >= Constants.EncoderConstants.HALF_TURN) {
+    //     RobotContainer.driveSubsystem.trackObject();
+    //     RobotContainer.driveSubsystem.stop();
+    //     // ↓ takes RPM instead of percentage as param ↓
+    //     RobotContainer.shooterSubsystem.setVelocity(3395);
+
+    //   }
+    // }
   }
 
   @Override
@@ -103,7 +123,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    currentTime = Timer.getFPGATimestamp();
+    SmartDashboard.putBoolean("Limit Switch", Indexer.limitSwitch.get());
+  }
 
   @Override
   public void testInit() {

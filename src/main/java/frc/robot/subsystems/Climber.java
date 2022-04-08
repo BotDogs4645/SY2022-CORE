@@ -22,24 +22,14 @@ public class Climber extends SubsystemBase {
 
   public void climberDown() {
     SmartDashboard.putString("climber:", "down");
-    rightClimberMotor.set(-0.5);
-    leftClimberMotor.set(-0.5);
-    if (rightClimberMotor.getBusVoltage() >= 30 && leftClimberMotor.getBusVoltage() >= 30) {
-      rightClimberMotor.set(0);
-      leftClimberMotor.set(0);
-      upFlag = false;
-    }
+    leftClimberMotor.set(-0.25);
+    rightClimberMotor.set(-0.25);
   }
 
   public void climberUp() {
     SmartDashboard.putString("climber:", "up");
-    rightClimberMotor.set(0.5);
-    leftClimberMotor.set(0.5);
-    if (rightClimberMotor.getBusVoltage() >= 30 && leftClimberMotor.getBusVoltage() >= 30) {
-      rightClimberMotor.set(0);
-      leftClimberMotor.set(0);
-      upFlag = true;
-    }
+    leftClimberMotor.set(0);
+    rightClimberMotor.set(0);
   }
 
   @Override
