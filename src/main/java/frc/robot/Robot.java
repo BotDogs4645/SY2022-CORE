@@ -129,7 +129,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     currentTime = Timer.getFPGATimestamp();
-    SmartDashboard.putBoolean("Limit Switch", Indexer.limitSwitch.get());
+    SmartDashboard.putBoolean("Limit Switch", RobotContainer.limitSwitch.get());
 
     RobotContainer.limitSwitchState = RobotContainer.limitSwitch.get(); 
   }

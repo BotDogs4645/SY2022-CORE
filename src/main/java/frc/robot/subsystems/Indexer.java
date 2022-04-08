@@ -67,7 +67,7 @@ public class Indexer extends SubsystemBase {
       raiseIntakeMotor.set(armSpeed);
 
     }
-    raiseIntakeMotor.set(0);
+    raiseIntakeMotor.set(-0.12);
   }
 
   public void raiseIntake() {
