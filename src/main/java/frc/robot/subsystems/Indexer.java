@@ -9,12 +9,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 public class Indexer extends SubsystemBase {
   public WPI_TalonFX verticalIndexerMotor;
   public WPI_TalonSRX horizontalIndexerMotor;
-  public static DigitalInput limitSwitch = new DigitalInput(8);
   private WPI_TalonSRX raiseIntakeMotor = new WPI_TalonSRX(Constants.IndexerConstants.RAISE_INTAKE_MOTOR);
+
 
   private WPI_TalonSRX intakeMotor = new WPI_TalonSRX(Constants.IndexerConstants.INTAKE_MOTOR);
 
@@ -61,9 +62,10 @@ public class Indexer extends SubsystemBase {
   public void lowerIntake() {
     SmartDashboard.putNumber("lower intake sped", armSpeed);
     
-    while(limitSwitch.get()) { // lower
+    if(RobotContainer.limitSwitchState) { // lower
       armSpeed = -0.25;
       raiseIntakeMotor.set(armSpeed);
+
     }
     raiseIntakeMotor.set(0);
   }

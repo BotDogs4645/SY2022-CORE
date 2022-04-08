@@ -122,7 +122,7 @@ public final class Constants {
     }
   
     public static final class IndexerConstants {
-        public static int VERTICAL_INDEXER_MOTOR  = 0; 
+        public static int VERTICAL_INDEXER_MOTOR  = 14;  //formally 0, changed bc of pdp conflict
         public static int HORIZONTAL_INDEXER_MOTOR = 1;
         public static final int INTAKE_MOTOR = 3; 
         public static int RAISE_INTAKE_MOTOR = 4;

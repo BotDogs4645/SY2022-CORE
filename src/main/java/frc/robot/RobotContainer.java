@@ -3,6 +3,8 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -32,7 +34,7 @@ public class RobotContainer {
  private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_LEFT_MOTOR);
  private final static WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_LEFT_MOTOR);
 
-  private static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
+  private final static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
   private final static WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
@@ -74,6 +76,10 @@ public class RobotContainer {
   public static final ShooterIntegratedPID shooterSubsystem = new ShooterIntegratedPID(shooterMotor, shooterMotor2, verticalIndexerMotor, horizontalIndexerMotor);
   public final static Climber climberSubsystem = new Climber(rightClimberMotor, leftClimberMotor, buttonController);
   public static Indexer indexerSubsystem = new Indexer(verticalIndexerMotor, horizontalIndexerMotor);
+
+  //Limit Switch
+  public static DigitalInput limitSwitch = new DigitalInput(8);
+  public static boolean limitSwitchState; 
   
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);

@@ -4,6 +4,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,6 +33,8 @@ public class Robot extends TimedRobot {
   private double lastCall = 0;
   UsbCamera driverVision;
 
+
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -43,8 +46,9 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
    // UsbCamera camcam = new CameraServer();
-    driverVision = CameraServer.startAutomaticCapture(0);
+   // driverVision = CameraServer.startAutomaticCapture(0);
     //m_robotContainer.driveSubsystem.declareGrip();
+
   }
 
   /**
@@ -74,7 +78,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutoCommand();
-    lastCall = Timer.getFPGATimestamp();
+    //lastCall = Timer.getFPGATimestamp();
   }
 
   /** Autonomous Sequence assumes that the robot starts out with the robot aligned with a cargo ball
@@ -126,6 +130,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     currentTime = Timer.getFPGATimestamp();
     SmartDashboard.putBoolean("Limit Switch", Indexer.limitSwitch.get());
+
+    RobotContainer.limitSwitchState = RobotContainer.limitSwitch.get(); 
   }
 
   @Override
