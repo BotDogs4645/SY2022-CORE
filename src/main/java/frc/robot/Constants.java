@@ -8,7 +8,8 @@ public final class Constants {
     }
 
     public static final class GamepadButtons {
-        //public static int CLIMBER_BUTTON = 0; // CHANGE
+        public static int CLIMBER_BUTTON_UP = 8;
+        public static int CLIMBER_BUTTON_DOWN = 7; 
 
         public static int LOWER_INTAKE = 2;
         public static int RAISE_INTAKE = 4;

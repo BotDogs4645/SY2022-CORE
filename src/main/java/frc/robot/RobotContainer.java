@@ -31,11 +31,11 @@ import frc.robot.subsystems.ShooterIntegratedPID;
 public class RobotContainer {
   public static LimelightMath LimeMath = new LimelightMath();
  // tank drive motors
- private static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_LEFT_MOTOR);
- private final static WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_LEFT_MOTOR);
+ public static WPI_TalonFX upperLeftMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_LEFT_MOTOR);
+ public static WPI_TalonFX lowerLeftMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_LEFT_MOTOR);
 
-  private final static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
-  private final static WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
+  public static WPI_TalonFX upperRightMotor = new WPI_TalonFX(Constants.DriveConstants.UPPER_RIGHT_MOTOR);
+  public static WPI_TalonFX lowerRightMotor = new WPI_TalonFX(Constants.DriveConstants.LOWER_RIGHT_MOTOR);
  
   // climber motors
   private final static WPI_TalonSRX rightClimberMotor = new WPI_TalonSRX(Constants.ClimberConstants.LEFT_CLIMBER_ID);
@@ -58,14 +58,15 @@ public class RobotContainer {
 
   // buttons
   public final JoystickButton alignButton = new JoystickButton(buttonController, Constants.DriveModes.LIMELIGHT_DRIVE);
-  //public final JoystickButton climbButton = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON);
+  public final JoystickButton climbButtonUp = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON_UP);
+  public final JoystickButton climbButtonDown = new JoystickButton(buttonController, Constants.GamepadButtons.CLIMBER_BUTTON_DOWN);
   public final JoystickButton shooterButton = new JoystickButton(driveController, Constants.JoystickButtons.SHOOTER);
   public final static JoystickButton absorbButton = new JoystickButton(buttonController, Constants.GamepadButtons.ABSORB);
   public final static JoystickButton unabsorbButton = new JoystickButton(buttonController, Constants.GamepadButtons.UNABSORB);
   public final JoystickButton verticalIndexerButton = new JoystickButton(buttonController, Constants.GamepadButtons.VERTICAL_INDEXER);
   public final JoystickButton raiseIntakeButton = new JoystickButton(buttonController, Constants.GamepadButtons.RAISE_INTAKE);
   public final JoystickButton lowerIntakeButton = new JoystickButton(buttonController, Constants.GamepadButtons.LOWER_INTAKE);
-  public final JoystickButton shooterOn = new JoystickButton(driveController, Constants.JoystickButtons.SHOOTER_ENABLE);
+  public final JoystickButton limelightEnable = new JoystickButton(driveController, Constants.JoystickButtons.SHOOTER_ENABLE);
 
   // shooter motors
   public final static WPI_TalonFX shooterMotor = new WPI_TalonFX(Constants.IntegratedShooterPID.SHOOTIE_ID);
@@ -107,9 +108,12 @@ public class RobotContainer {
       // chooser.addOption("auto1",);
       Shuffleboard.getTab("Main").add("Auto Command", chooser).withPosition(1, 1);
       alignButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveModes.LIMELIGHT_DRIVE));
-      shooterOn.whileHeld(new InstantCommand(driveSubsystem::trackObject, driveSubsystem));
-
+      limelightEnable.whileHeld(new InstantCommand(driveSubsystem::trackObject, driveSubsystem));
       shooterButton.whenPressed(new InstantCommand(shooterSubsystem::setRPMFromDistanceAuto, shooterSubsystem));
+
+      //climbing buttons
+      climbButtonDown.whenPressed(new InstantCommand(climberSubsystem::climberDown, climberSubsystem));
+      climbButtonUp.whenPressed(new InstantCommand(climberSubsystem::climberUp, climberSubsystem));
       
       // intake + indexer
       absorbButton.whileHeld(new InstantCommand(indexerSubsystem::absorb, indexerSubsystem));

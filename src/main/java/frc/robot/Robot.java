@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.Drive;
 import frc.robot.commands.LimelightAlignToLower;
 import frc.robot.commands.ToClosestPlottedPosition;
 import frc.robot.subsystems.DriveTrain;
@@ -29,6 +30,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  //private DriveTrain driveSub = new DriveTrain(leftMotors, rightMotors, driveController, encLeftMotor, encRightMotor)
   public static double distanceToHub;
   public static double currentTime;
   private double lastCall = 0;
@@ -113,12 +116,7 @@ public class Robot extends TimedRobot {
 
     //   }
     // }
-
-    RobotContainer.driveSubsystem.differentialDriveSub.tankDrive(0.3, 0.3);
-    Timer.delay(3.5);
-    RobotContainer.driveSubsystem.differentialDriveSub.tankDrive(0, 0);
-
-    
+    //RobotContainer.driveSubsystem.autoDrive(); 
   }
 
   @Override
