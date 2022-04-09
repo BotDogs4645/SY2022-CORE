@@ -207,7 +207,7 @@ public class ShooterIntegratedPID extends SubsystemBase {
       double inc = (curDistance - closestDistance) * slope;
       setVelocity(closestRPMToDistance + inc);
     }
-    if ((LimeMath.target == 0.0)) {
+    else if ((LimeMath.target == 0.0)) {
       enabledManual = false;
       toggleOff();
     }

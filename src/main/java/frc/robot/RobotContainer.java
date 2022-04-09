@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.Climber;
@@ -22,6 +21,7 @@ import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightMath;
 import frc.robot.Constants.JoystickButtons;
+import frc.robot.commands.Auto;
 import frc.robot.commands.ChangeDriveMode;
 import frc.robot.subsystems.ShooterIntegratedPID;
 
@@ -51,7 +51,7 @@ public class RobotContainer {
   public final static XboxController buttonController  = new XboxController(Constants.DriveConstants.BUTTON_CONTROLLER); 
 
   // joy buttons
-  public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
+  //public final JoystickButton enableLimey = new JoystickButton(driveController, Constants.JoystickButtons.LIMEY_TOGGLE);
 
   // buttons
   public final JoystickButton alignButton = new JoystickButton(buttonController, Constants.DriveModes.LIMELIGHT_DRIVE);
@@ -82,8 +82,8 @@ public class RobotContainer {
   // commands
   public final Drive driveCommand = new Drive(driveSubsystem);
   public final ChangeDriveMode changeDriveMode = new ChangeDriveMode(driveSubsystem, Constants.DriveModes.JOYSTICK_DRIVE); // default drive mode is manual joystick
-
-  public SendableChooser<Command> chooser = new SendableChooser<>();
+  public final Auto autoCommand = new Auto(driveSubsystem, indexerSubsystem);
+  //public final Temp tempCommand = new Temp();
 
   public RobotContainer() {
     leftMotors.setInverted(false);
@@ -99,14 +99,9 @@ public class RobotContainer {
     //     new LimelightAlignToLower(driveSubsystem),
     //     new ToClosestPlottedPosition(driveSubsystem))
     //   ); 
-      // chooser.addOption("Main", new InstantCommand());
-      // chooser.addOption("Auto 1", new AutoProfile1(driveSubsystem, shooterSubsystem));
-
-      // chooser.addOption("auto1",);
-      Shuffleboard.getTab("Main").add("Auto Command", chooser).withPosition(1, 1);
       alignButton.whenPressed(new ChangeDriveMode(driveSubsystem, Constants.DriveModes.LIMELIGHT_DRIVE));
       limelightEnable.whileHeld(new InstantCommand(driveSubsystem::trackObject, driveSubsystem));
-      shooterButton.whenPressed(new InstantCommand(shooterSubsystem::setRPMFromDistanceAuto, shooterSubsystem));
+     // shooterButton.whenPressed(new InstantCommand(shooterSubsystem::setRPMFromDistanceAuto, shooterSubsystem));
 
       //climbing buttons
       climbButtonDown.whenPressed(new InstantCommand(climberSubsystem::climberDown, climberSubsystem));
@@ -123,8 +118,7 @@ public class RobotContainer {
       lowerIntakeButton.whenPressed(new InstantCommand(indexerSubsystem::lowerIntake, indexerSubsystem));
   }
 
-  public Command getAutoCommand() {
-    return chooser.getSelected();
-
+  public Command getAutonomousCommand() {
+    return autoCommand;
   }
 }

@@ -1,15 +1,12 @@
 package frc.robot.subsystems;
 
-import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.DigitalInput;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 public class Indexer extends SubsystemBase {
   public WPI_TalonFX verticalIndexerMotor;
@@ -17,7 +14,7 @@ public class Indexer extends SubsystemBase {
   private WPI_TalonSRX raiseIntakeMotor = new WPI_TalonSRX(Constants.IndexerConstants.RAISE_INTAKE_MOTOR);
 
 
-  private WPI_TalonSRX intakeMotor = new WPI_TalonSRX(Constants.IndexerConstants.INTAKE_MOTOR);
+  public WPI_TalonSRX intakeMotor = new WPI_TalonSRX(Constants.IndexerConstants.INTAKE_MOTOR);
 
   private double indexerSpeed = 0.3; 
   private double intakeSpeed = 0.5;
@@ -48,15 +45,6 @@ public class Indexer extends SubsystemBase {
   public void enableVerticalIndexer() {
     SmartDashboard.putNumber("vertical indexer", -indexerSpeed);
     verticalIndexerMotor.set(-indexerSpeed);
-    /*
-    while(RobotContainer.buttonController.getRawButtonPressed(Constants.GamepadButtons.VERTICAL_INDEXER)) {
-      SmartDashboard.putNumber("vertical indexer", -indexerSpeed);
-      verticalIndexerMotor.set(-indexerSpeed);
-      if(!RobotContainer.buttonController.getRawButtonPressed(Constants.GamepadButtons.VERTICAL_INDEXER)) {
-        stopIndexer();
-      }
-    }
-    */
   }
 
   public void lowerIntake() {

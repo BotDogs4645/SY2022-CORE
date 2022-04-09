@@ -87,6 +87,8 @@ public class DriveTrain extends SubsystemBase {
 
     this.encLeftMotor = (WPI_TalonFX) encLeftMotor;
     this.encRightMotor = (WPI_TalonFX) encRightMotor;
+
+    averageDisplacement = 0;
     
     resetEncoders();
     this.encLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -184,21 +186,23 @@ public class DriveTrain extends SubsystemBase {
     averageDisplacement = 0;
   }
 
-  public boolean encoderDrive() {
-    driveSpeed = Constants.EncoderConstants.SPEED * -1;  
+  public void encoderDrive() {
+    driveSpeed = Constants.EncoderConstants.SPEED * -2.8;  
+    turnSpeed = 0;
 
     SmartDashboard.putNumber("drive speed", driveSpeed);
     SmartDashboard.putNumber("turn rate", turnSpeed);
   
-    if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
-      SmartDashboard.putNumber("Average Displacement", averageDisplacement);
+    //if(averageDisplacement < Constants.EncoderConstants.TARGET_DISTANCE_FT) {
+      //SmartDashboard.putNumber("Average Displacement in DriveTrain", averageDisplacement);
       // getCorrection(); // updates turn
-      differentialDriveSub.tankDrive(Constants.EncoderConstants.SPEED, Constants.EncoderConstants.SPEED); 
+      differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
+      //differentialDriveSub.tankDrive(Constants.EncoderConstants.SPEED, Constants.EncoderConstants.SPEED); 
       updateAverageDisplacement();
-      return true;
-    }
-    stop();
-    return false;
+      //return true;
+    //}
+    //stop();
+    //return false;
   }
 
   public void stop() {
