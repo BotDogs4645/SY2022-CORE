@@ -44,7 +44,7 @@ public class Drive extends CommandBase {
     */
     DriveTrain.driveMode = Constants.DriveModes.JOYSTICK_DRIVE; // once target has been reached, toggle to manual
     driveTrainSubsystem.resetEncoders();
-     driveTrainSubsystem.driveWithJoystick();
+    driveTrainSubsystem.driveWithJoystick();
   }
 
   // Called once the command ends or is interrupted.

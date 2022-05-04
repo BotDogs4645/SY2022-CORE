@@ -67,11 +67,6 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    autoCommand = m_robotContainer.getAutonomousCommand();
-    
-    if(autoCommand != null) {
-      autoCommand.schedule();
-    }
     //lastCall = Timer.getFPGATimestamp();
   }
 
@@ -124,10 +119,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     currentTime = Timer.getFPGATimestamp();
-    SmartDashboard.putBoolean("Limit Switch", RobotContainer.limitSwitch.get());
     // ↓ returns the hypotenuse to the hub, not the horizontal distance ↓ 
-    distanceToHub = RobotContainer.LimeMath.getDistanceFromHub();
-    RobotContainer.limitSwitchState = RobotContainer.limitSwitch.get(); 
   }
 
   @Override

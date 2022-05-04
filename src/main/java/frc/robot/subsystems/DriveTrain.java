@@ -57,20 +57,7 @@ public class DriveTrain extends SubsystemBase {
   public boolean resetHalfTurn = true;
   public double avgRevolutionsTracked;
 
-  private GripPipeline pipe;
-  private VisionThread VisionThread;
-  public static boolean alignedToHub = false;
-  public static boolean inPreferredPosition = false;
-  private Object foundTarget = new Object();
-
-  public LimelightMath LimeMath;
   public boolean testingMode = true;
-
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-console");
-  NetworkTableEntry tx = table.getEntry("tx");
-  NetworkTableEntry tv = table.getEntry("tv");
-  NetworkTableEntry ta = table.getEntry("ta");
-  NetworkTableEntry ty = table.getEntry("ty");
 
   private final AHRS ahrs = new AHRS();
   public final DifferentialDrive differentialDriveSub;
@@ -80,7 +67,6 @@ public class DriveTrain extends SubsystemBase {
     this.driveController = driveController;
 
     driveMode = Constants.DriveModes.JOYSTICK_DRIVE;
-    LimeMath = RobotContainer.LimeMath;
 
     this.leftMotors = leftMotors;
     this.rightMotors = rightMotors;
@@ -167,17 +153,6 @@ public class DriveTrain extends SubsystemBase {
     turnSpeed = filterRight.calculate(driveController.getZ()); //* -1);
 
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
-
-    // LEFT CLIMBER TRIGGER
-    if(RobotContainer.buttonController.getLeftTriggerAxis() >= 0.5) {
-      SmartDashboard.putNumber("left trigger", RobotContainer.buttonController.getLeftTriggerAxis());
-      RobotContainer.climberSubsystem.climberDown();
-    }
-    // RIGHT CLIMBER TRIGGER
-    if(RobotContainer.buttonController.getRightTriggerAxis() >= 0.5) {
-      SmartDashboard.putNumber("right trigger", RobotContainer.buttonController.getRightTriggerAxis());
-      RobotContainer.climberSubsystem.climberUp(); //sets speed to 0
-    }
   }
 
   public void resetEncoders() {
@@ -209,73 +184,6 @@ public class DriveTrain extends SubsystemBase {
     driveSpeed = 0;
     turnSpeed = 0;
     differentialDriveSub.arcadeDrive(driveSpeed, turnSpeed);
-  }
-
-  public void trackObject(double f, double rot) { // IN TANK DRIVE!
-    if (rot > 0) {
-      rot += Constants.LimelightConstants.LIMELIGHT_ROTATION_F;
-    }
-    else if (rot < 0) {
-      rot -= Constants.LimelightConstants.LIMELIGHT_ROTATION_F;
-    }
-    
-    if (Math.abs(LimeMath.tx) < .8) {
-      alignedToHub = true;
-    } else {
-      alignedToHub = false;
-    }
-    
-    differentialDriveSub.arcadeDrive(0, rot);
-  }
-  
-  public boolean isAligned() {
-    return alignedToHub;
-  }
-
-  public boolean isRepositioned() {
-    return inPreferredPosition;
-  }
-
-  public double getLimeX() {
-    return LimeMath.tx;
-  }
-
-  public void repositionBot(double f, double rot) {
-    // Assumes bot is aligned, meaning that we only need to manipulate the bot's direction in the Y direction.
-    double closestDistance = LimeMath.getClosestRelatedDistance(true);
-    // if closestdisance is less than the distance, it means we go forward, opposite -> backward
-    if (closestDistance < LimeMath.getDistanceFromHub()) {
-      differentialDriveSub.arcadeDrive(f + Constants.LimelightConstants.LIMELIGHT_FOW_F, 0);
-    } else {
-      differentialDriveSub.arcadeDrive(f - Constants.LimelightConstants.LIMELIGHT_FOW_F, 0);
-    }
-
-    if (Math.abs(closestDistance - LimeMath.getDistanceFromHub()) < 5) {
-      inPreferredPosition = true;
-    }  else {
-      inPreferredPosition = false;
-    }
-  }
-
-  public double getLimeDistanceToHub() {
-    return LimeMath.adjacent;
-  }
-
-  public double getClosestRelatedDistance() {
-    return LimeMath.getClosestRelatedDistance(true);
-  }
-
-  public void trackObject() {
-    double xOffset = -tx.getDouble(0.0);
-    SmartDashboard.putNumber("xOffset", xOffset);
-    double finalRot = 0.0;
-    if (xOffset < .25) { //0.25 represents 1/4 of a degree as measured by the limelight, this prevents the robot from overshooting its turn
-      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset + Constants.DriveConstants.MIN_ROT_SPEED;
-    }
-    else if (xOffset > .25) {   // dampens the rotation at the end while turning
-      finalRot = Constants.DriveConstants.ROT_MULTIPLIER * xOffset - Constants.DriveConstants.MIN_ROT_SPEED;
-    }
-    differentialDriveSub.tankDrive(finalRot, -finalRot);
   }
 
   public void autoDrive() {
