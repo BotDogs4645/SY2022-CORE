@@ -21,13 +21,13 @@ public class Climber extends SubsystemBase {
 
   public void climberDown() {
     SmartDashboard.putString("climber:", "down");
-    leftClimberMotor.set(-0.25);
+    leftClimberMotor.set(0.25);
     rightClimberMotor.set(-0.25);
   }
 
   public void climberUp() {
     SmartDashboard.putString("climber:", "up");
-    leftClimberMotor.set(0.12);
+    leftClimberMotor.set(-0.12);
     rightClimberMotor.set(0.12);
   }
 
